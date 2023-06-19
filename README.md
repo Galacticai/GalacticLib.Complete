@@ -2,7 +2,9 @@
 ## Family of .NET libraries packed as nuget packages
 
 This repository includes all child packages directly instead of referencing their nugets (faster updates) ... Unlike [GalacticLib](https://github.com/Galacticai/GalacticLib) which references the child nuget packages 
-<br/> ❔ What to use? Honestly you should use specific child packages listed below instead of the full GalacticLib package. but this package is more up to date most of the time (since child packages require more care and fine tuning to be updated)
+#### ❔ What to use? 
+ - For flexibility: you should use specific child packages listed below instead of the full GalacticLib package.
+ - For updates: This package is up to date most of the time while child packages require more care and fine tuning to be updated so they often get left behind.
 
 <a href="#"> 
     <img src="https://img.shields.io/badge/-Targeting-gray" />
