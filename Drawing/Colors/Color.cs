@@ -3,7 +3,7 @@ using System.Text;
 namespace GalacticLib.Drawing.Colors;
 
 /// <summary> Color represented by RGBA <see cref="byte"/> values </summary>
-public class Color {
+public class Color : IEquatable<Color> {
     #region this object
     public byte Red { get; set; }
     public byte Green { get; set; }
@@ -37,11 +37,15 @@ public class Color {
     #endregion
     #region Methods
 
+    public static Color Monochrome(byte value) => new(value, value, value);
+    public static Color Opaque(byte red, byte green, byte blue) => new(red, green, blue);
+    public static Color Translucent(byte red, byte green, byte blue) => new(red, green, blue, 0x00);
+
     public static byte ExtractAlpha(uint value, bool argb = false) => (byte)((value >> (argb ? AlphaShift : AlphaShiftARGB)) & 0xFF);
     public static byte ExtractRed(uint value, bool argb = false) => (byte)((value >> (argb ? RedShift : RedShiftARGB)) & 0xFF);
     public static byte ExtractGreen(uint value, bool argb = false) => (byte)((value >> (argb ? GreenShift : GreenShiftARGB)) & 0xFF);
     public static byte ExtractBlue(uint value, bool argb = false) => (byte)((value >> (argb ? BlueShift : BlueShiftARGB)) & 0xFF);
-    public static Color Monochrome(byte black) => new(black, black, black);
+
     public static Color FromCMYK(ColorCMYK color)
         => FromCMYK(color.Cyan, color.Magenta, color.Yellow, color.Alpha);
     public static Color FromCMYK(byte cyan, byte magenta, byte yellow, byte black, byte alpha = 0xFF)
@@ -90,9 +94,64 @@ public class Color {
         return sb.ToString();
     }
 
+    public override int GetHashCode()
+        => HashCode.Combine(Red, Green, Blue, Alpha);
+
     #endregion
     #endregion
     #region Operators
+    #region Comparison
+
+
+    public bool Equals(Color? other)
+        => ReferenceEquals(this, other)
+        || (
+            other is Color color
+            && Red == color.Red
+            && Green == color.Green
+            && Blue == color.Blue
+            && Alpha == color.Alpha
+        );
+
+    //!? Just to please the IDE
+    public override bool Equals(object? other)
+        => other is Color color && this.Equals(color);
+    public static bool operator ==(Color left, Color right) => left.Equals(right);
+    public static bool operator !=(Color left, Color right) => !(left == right);
+
+    #endregion
+    #region Math
+
+    public static Color operator +(Color left, Color right)
+        => new(
+            (byte)(left.Red + right.Red),
+            (byte)(left.Green + right.Green),
+            (byte)(left.Blue + right.Blue),
+            (byte)(left.Alpha + right.Alpha)
+        );
+    public static Color operator -(Color left, Color right)
+        => new(
+            (byte)(left.Red - right.Red),
+            (byte)(left.Green - right.Green),
+            (byte)(left.Blue - right.Blue),
+            (byte)(left.Alpha - right.Alpha)
+        );
+    public static Color operator *(Color left, Color right)
+        => new(
+            (byte)(left.Red * right.Red),
+            (byte)(left.Green * right.Green),
+            (byte)(left.Blue * right.Blue),
+            (byte)(left.Alpha * right.Alpha)
+        );
+    public static Color operator /(Color left, Color right)
+        => new(
+            (byte)(left.Red / right.Red),
+            (byte)(left.Green / right.Green),
+            (byte)(left.Blue / right.Blue),
+            (byte)(left.Alpha / right.Alpha)
+        );
+
+    #endregion
     #region Conversion
 
     public static implicit operator Color(System.Drawing.Color sysColor) => new(sysColor.R, sysColor.G, sysColor.B, sysColor.A);
@@ -254,4 +313,5 @@ public class Color {
         public static Color WhiteSmoke => new(0xF5, 0xF5, 0xF5);
         public static Color YellowGreen => new(0x9A, 0xCD, 0x32);
     }
+
 }
