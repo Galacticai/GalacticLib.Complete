@@ -1,6 +1,7 @@
 ﻿using System.Linq.Expressions;
 
 namespace GalacticLib.Math.Numerics.Numbers;
+
 /// <summary>
 /// <br/> + More features
 /// <br/><br/> ⚠️ Warning: This type cannot defend against <see cref="InvalidOperationException"/>!
