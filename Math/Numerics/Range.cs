@@ -25,20 +25,20 @@ public class Range<T>
     private Number<T> _End;
     /// <summary> Srarting boundary </summary>
     public Number<T> Start {
-        get => FromEnd ? _End : _Start;
+        get => Reverse ? _End : _Start;
         set => _Start = value;
     }
     /// <summary> Ending boundary </summary>
     public Number<T> End {
-        get => FromEnd ? _Start : _End;
+        get => Reverse ? _Start : _End;
         set => _End = value;
     }
     /// <summary> Reverses the <see cref="Start"/> and <see cref="End"/> </summary>
-    public bool FromEnd { get; set; }
+    public bool Reverse { get; set; }
     public Range(Number<T> start, Number<T> end, bool fromEnd) {
         Start = start;
         End = end;
-        FromEnd = fromEnd;
+        Reverse = fromEnd;
     }
     public Range(Number<T> start, Number<T> end) : this(start, end, false) { }
 
