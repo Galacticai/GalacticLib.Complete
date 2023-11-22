@@ -1,4 +1,4 @@
-﻿// —————————————————————————————————————————————
+// —————————————————————————————————————————————
 //?
 //!? 📜 SemanticVersion.cs
 //!? 🖋️ Galacticai 📅 2022 - 2023
@@ -173,12 +173,13 @@ public class SemanticVersion {
     }
 #nullable enable
     public override bool Equals(object? obj)
-        => obj is SemanticVersion other
+        => ReferenceEquals(this, obj)
+        || (obj is SemanticVersion other
             && Major == other.Major
             && Minor == other.Minor
             && Patch == other.Patch
             && BuildType == other.BuildType
-            && Build == other.Build;
+            && Build == other.Build);
 #nullable restore
 
     /// <summary> Convert to <see cref="string"/> </summary>
