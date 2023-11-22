@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using static System.Math;
 
 namespace GalacticLib.Math.Numerics;
@@ -24,7 +24,7 @@ public class SymmetricNormalGrid {
     public double Spread { get; }
     /// <summary> Get a value </summary>
     public double Value(int x, int y) => _Values[x, y];
-    public readonly double[,] _Values;
+    private double[,] _Values { get; }
     public SymmetricNormalGrid(int size, double spread) {
         Size = size == 0 ? 1 : Abs(size);
         Spread = spread;
