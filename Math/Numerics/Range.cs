@@ -59,8 +59,10 @@ public class Range<T>
     /// <returns> <see cref="Min"/> &lt;= <paramref name="x"/> &lt;= <see cref="Max"/> </returns>
     public Number<T> Clamp(Number<T> x) => NumberMath<T>.Clamp(x, Min, Max);
 
-    public Range<T> Intersect(Range<T> range) => new(NumberMath<T>.Max(Min, range.Min), NumberMath<T>.Min(Max, range.Max));
-    public Range<T> Add(Range<T> range) => new(NumberMath<T>.Min(Min, range.Min), NumberMath<T>.Max(Max, range.Max));
+    public Range<T> Intersect(Range<T> range)
+        => new(NumberMath<T>.Max(Min, range.Min), NumberMath<T>.Min(Max, range.Max));
+    public Range<T> Add(Range<T> range)
+        => new(NumberMath<T>.Min(Min, range.Min), NumberMath<T>.Max(Max, range.Max));
     public Range<T>? Subtract(Range<T> range) {
         if (range.Contains(this)) return null;
         else if (!Overlaps(range))
