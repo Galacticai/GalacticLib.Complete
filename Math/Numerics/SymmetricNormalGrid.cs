@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using static System.Math;
 
 namespace GalacticLib.Math.Numerics;
@@ -20,7 +20,8 @@ public class SymmetricNormalGrid {
     #region this object
     /// <summary> Grid size </summary>
     public int Size { get; }
-    public float Mean => (Size - 1) / 2f; //no need for double precision, it is either x.0 or x.5
+    /// <summary> Mean of the distribution </summary>
+    public float Mean { get; }
     /// <summary> Standard deviation </summary>
     public double Spread { get; }
 
@@ -33,6 +34,7 @@ public class SymmetricNormalGrid {
     public SymmetricNormalGrid(int size, double spread) {
         if (size <= 0) throw new ArgumentOutOfRangeException(nameof(size));
         Size = size;
+        Mean = (Size - 1) / 2f; //!? no need for 64bit, it is either x.0 or x.5
         Spread = spread;
 
         _Values = new double[Size, Size];
