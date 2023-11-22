@@ -31,7 +31,8 @@ public class SymmetricNormalGrid {
     public double Value(int x, int y) => _Values[x, y];
     private double[,] _Values { get; }
     public SymmetricNormalGrid(int size, double spread) {
-        Size = size == 0 ? 1 : Abs(size);
+        if (size <= 0) throw new ArgumentOutOfRangeException(nameof(size));
+        Size = size;
         Spread = spread;
 
         _Values = new double[Size, Size];
