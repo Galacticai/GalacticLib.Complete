@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using static System.Math;
 
 namespace GalacticLib.Math.Numerics;
@@ -22,7 +22,11 @@ public class SymmetricNormalGrid {
     public float Mean => (Size - 1) / 2f; //no need for double precision, it is either x.0 or x.5
     /// <summary> Standard deviation </summary>
     public double Spread { get; }
-    /// <summary> Get a value </summary>
+
+    /// <summary> Get a value at <paramref name="x"/>,<paramref name="y"/> coordinates </summary>
+    public double this[int x, int y] => Value(x, y);
+
+    /// <summary> Get a value at <paramref name="x"/>,<paramref name="y"/> coordinates </summary>
     public double Value(int x, int y) => _Values[x, y];
     private double[,] _Values { get; }
     public SymmetricNormalGrid(int size, double spread) {
