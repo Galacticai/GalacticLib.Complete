@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using static System.Math;
 
 namespace GalacticLib.Math.Numerics;
@@ -24,13 +24,13 @@ public class SymmetricNormalGrid {
     public float Mean { get; }
     /// <summary> Standard deviation </summary>
     public double Spread { get; }
+    private double[,] _Values { get; }
 
     /// <summary> Get a value at <paramref name="x"/>,<paramref name="y"/> coordinates </summary>
     public double this[int x, int y] => Value(x, y);
 
     /// <summary> Get a value at <paramref name="x"/>,<paramref name="y"/> coordinates </summary>
     public double Value(int x, int y) => _Values[x, y];
-    private double[,] _Values { get; }
     public SymmetricNormalGrid(int size, double spread) {
         if (size <= 0) throw new ArgumentOutOfRangeException(nameof(size));
         Size = size;
