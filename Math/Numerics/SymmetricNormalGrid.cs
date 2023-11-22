@@ -1,10 +1,11 @@
-﻿using System.Text;
+using System.Text;
 using static System.Math;
 
 namespace GalacticLib.Math.Numerics;
 
 /// <summary> Grid of values representing a 2D symmetrical normal distribution curve.
-/// <br/> Such that the values are mirrored using half a quadrant as the original measurement
+/// <br/> (<see href="https://en.wikipedia.org/wiki/Normal_distribution"/>)
+/// <br/> Optimized for performance such that the values are mirrored using half a quadrant as the original measurement
 /// <br/><br/> Example: (O=original, M=mirror)
 /// <br/> O O O O M M M M
 /// <br/> M O O O M M M M
