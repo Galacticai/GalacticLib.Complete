@@ -3,13 +3,25 @@ using System.Reflection;
 namespace GalacticLib.Objects;
 
 public class VirtualObject<T>(T instance) {
-    private T _Instance { get; } = instance;
-    private Dictionary<string, MethodOverride> _MethodOverrides { get; } = [];
+    T _Instance { get; }
+        = instance;
+    Dictionary<string, MethodOverride> _MethodOverrides { get; }
+        = [];
+    HashSet<string> _MethodNames { get; }
+        = typeof(T).GetMethods()
+            .Aggregate(new HashSet<string>(),
+                (set, method) => {
+                    set.Add(method.Name);
+                    return set;
+                }
+            );
 
     public delegate object MethodOverride(T instance, object[] args);
 
-    public void OverrideMethod(string methodName, MethodOverride methodOverride) {
+    public bool OverrideMethod(string methodName, MethodOverride methodOverride) {
+        if (!_MethodNames.Contains(methodName)) return false;
         _MethodOverrides[methodName] = methodOverride;
+        return true;
     }
 
     public object? InvokeMethod(string methodName, params object[] args) {
