@@ -36,31 +36,15 @@ public static class ObjectTools {
             .GetUninitializedObject(type)
             .AsDictionary();
 
-    public static IDictionary<string, object?> AsDictionary(this object obj)
-        => obj.GetType().GetProperties().ToDictionary(
-            propInfo => propInfo.Name,
-            propInfo => propInfo.GetValue(obj)
-        );
-
-    // public static Dictionary<TKeyProperty, TValue> AsDictionary<TKeyProperty, TValue>(this TValue[] values, string keyPropertyName) {
-    //     PropertyInfo keyProperty = typeof(TValue).GetProperty(keyPropertyName);
-    //     //! Property not found (using name)
-    //     if (keyProperty == null) return null;
-
-    //     Dictionary<TKeyProperty, TValue> dictionary = new();
-    //     foreach (TValue value in values) {
-    //         object keyRaw = keyProperty.GetValue(value);
-    //         TKeyProperty key = default;
-    //         try {
-    //             key = (TKeyProperty)keyRaw;
-    //         } catch {
-    //             //? Key property type is invalid
-    //             return null;
-    //         }
-    //         dictionary.TryAdd(key, value);
-    //     }
-    //     return dictionary;
-    // }
+    public static IDictionary<string, object?> AsDictionary(this object obj) {
+        Type t = obj.GetType();
+        Dictionary<string, object?> dictionary = [];
+        foreach (var property in t.GetProperties())
+            dictionary[property.Name] = property.GetValue(obj);
+        foreach (var field in t.GetFields())
+            dictionary[field.Name] = field.GetValue(obj);
+        return dictionary;
+    }
 
     public static T AsObject<T>(this IDictionary<string, object> dictionary)
         where T : class, new() {
