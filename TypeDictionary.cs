@@ -130,11 +130,16 @@ public class TypeDictionary<AbstractTValue> {
             }
         );
 
-    public static implicit operator List<string>(TypeDictionary<AbstractTValue> typeDictionary) => typeDictionary.ToRawTypeList();
-    public static implicit operator List<Type>(TypeDictionary<AbstractTValue> typeDictionary) => typeDictionary.ToTypeList();
-    public static implicit operator List<AbstractTValue>(TypeDictionary<AbstractTValue> typeDictionary) => typeDictionary.ToValueList();
-    public static implicit operator Dictionary<string, AbstractTValue>(TypeDictionary<AbstractTValue> typeDictionary) => typeDictionary.ToRawDictionary();
-    public static implicit operator Dictionary<Type, AbstractTValue>(TypeDictionary<AbstractTValue> typeDictionary) => typeDictionary.ToDictionary();
+    public static implicit operator List<string>(TypeDictionary<AbstractTValue> typeDictionary)
+        => typeDictionary.ToRawTypeList();
+    public static implicit operator List<Type>(TypeDictionary<AbstractTValue> typeDictionary)
+        => typeDictionary.ToTypeList();
+    public static implicit operator List<AbstractTValue>(TypeDictionary<AbstractTValue> typeDictionary)
+        => typeDictionary.ToValueList();
+    public static implicit operator Dictionary<string, AbstractTValue>(TypeDictionary<AbstractTValue> typeDictionary)
+        => typeDictionary.ToRawDictionary();
+    public static implicit operator Dictionary<Type, AbstractTValue>(TypeDictionary<AbstractTValue> typeDictionary)
+        => typeDictionary.ToDictionary();
 
     #endregion
 }
