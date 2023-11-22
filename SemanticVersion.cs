@@ -1,4 +1,4 @@
-// —————————————————————————————————————————————
+﻿// —————————————————————————————————————————————
 //?
 //!? 📜 SemanticVersion.cs
 //!? 🖋️ Galacticai 📅 2022 - 2023
@@ -100,7 +100,7 @@ public class SemanticVersion {
             throw new ArgumentException("The provided version string does not follow the semantic version guidelines");
 
         versionString = versionString.Trim();
-        string?[] parts = new string?[5] { null, null, null, null, null };
+        string?[] parts = [null, null, null, null, null];
         int partIndex = 0;
 
         StringBuilder partBuilder = new();
@@ -195,7 +195,9 @@ public class SemanticVersion {
         return versionSB.ToString();
     }
 
-    public static implicit operator SemanticVersion(string versionString) => new(versionString, false);
-    public static implicit operator string(SemanticVersion semanticVersion) => semanticVersion.ToString();
+    public static implicit operator SemanticVersion(string versionString)
+        => new(versionString, false);
+    public static implicit operator string(SemanticVersion semanticVersion)
+        => semanticVersion.ToString();
 
 }
