@@ -37,8 +37,8 @@ public class SymmetricNormalGrid {
 
         _Values = new double[Size, Size];
 
-        double sdP2T2 = 2 * Pow(Spread, 2);
         int halfSize = Size / 2;
+        double spreadSquareTimes2 = 2 * Pow(Spread, 2); //? calc once outside the loops
 
         for (int x = 0; x <= halfSize; x++) {
             int xMirror = Size - 1 - x;
@@ -46,7 +46,7 @@ public class SymmetricNormalGrid {
             for (int y = x; y <= halfSize; y++) {
                 int yMirror = Size - 1 - y;
                 double yDistanceP2 = Pow(y - Mean, 2);
-                double value = Exp(-(xDistanceP2 + yDistanceP2) / sdP2T2);
+                double value = Exp(-(xDistanceP2 + yDistanceP2) / spreadSquareTimes2);
                 _Values[x, y] = value; // Half quadrant #1
                 _Values[xMirror, y] = value; // HQ3
                 _Values[x, yMirror] = value; // HQ5
