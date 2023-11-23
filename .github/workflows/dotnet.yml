@@ -36,7 +36,7 @@ jobs:
     steps:
       - name: Dev Build
         id: dev_build
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@latest
         with:
           files: |
             ./bin/Debug/net7.0/GalacticLib.dll
