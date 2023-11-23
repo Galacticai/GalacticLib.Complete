@@ -9,21 +9,21 @@
 //?
 // —————————————————————————————————————————————
 
-using s = System;
+using S = System;
 
 namespace GalacticLib.Math.Numerics.Numbers;
 
 public static class NumberMath {
-    public static bool IsNumericType(this s.Type type)
-        => s.Type.GetTypeCode(type) switch {
-            s.TypeCode.Byte or s.TypeCode.SByte
-            or s.TypeCode.UInt16 or s.TypeCode.UInt32 or s.TypeCode.UInt64
-            or s.TypeCode.Int16 or s.TypeCode.Int32 or s.TypeCode.Int64
-            or s.TypeCode.Single or s.TypeCode.Double or s.TypeCode.Decimal
+    public static bool IsNumericType(this Type type)
+        => Type.GetTypeCode(type) switch {
+            TypeCode.Byte or TypeCode.SByte
+            or TypeCode.UInt16 or TypeCode.UInt32 or TypeCode.UInt64
+            or TypeCode.Int16 or TypeCode.Int32 or TypeCode.Int64
+            or TypeCode.Single or TypeCode.Double or TypeCode.Decimal
                 => true,
             _ => false,
         };
-    public static bool CanUseAsNumericValue(this s.Type type)
+    public static bool CanUseAsNumericValue(this Type type)
         => Type.GetTypeCode(type) switch {
             TypeCode.Byte
             or TypeCode.SByte
@@ -40,11 +40,11 @@ public static class NumberMath {
             _ => false
         };
 
-    public static s.Type? GetWiderNumericType<T1, T2>()
-                where T1 : struct, s.IComparable, s.IComparable<T1>, s.IConvertible, s.IEquatable<T1>, s.ISpanFormattable
-                where T2 : struct, s.IComparable, s.IComparable<T2>, s.IConvertible, s.IEquatable<T2>, s.ISpanFormattable
+    public static Type? GetWiderNumericType<T1, T2>()
+                where T1 : struct, IComparable, IComparable<T1>, IConvertible, IEquatable<T1>, ISpanFormattable
+                where T2 : struct, IComparable, IComparable<T2>, IConvertible, IEquatable<T2>, ISpanFormattable
             => GetWiderNumericType(typeof(T1), typeof(T2));
-    public static s.Type? GetWiderNumericType(s.Type type1, s.Type type2) {
+    public static Type? GetWiderNumericType(Type type1, Type type2) {
         if (!CanUseAsNumericValue(type1) || !CanUseAsNumericValue(type2)) return null;
 
         if (type1 == type2) return type1;
@@ -73,9 +73,9 @@ public static class NumberMath {
         else return null;
     }
     public static bool IsFloatingPoint<T>() => typeof(T).IsFloatingPoint();
-    public static bool IsFloatingPoint(this s.Type type)
-        => s.Type.GetTypeCode(type) switch {
-            s.TypeCode.Decimal or s.TypeCode.Double or s.TypeCode.Single => true,
+    public static bool IsFloatingPoint(this Type type)
+        => Type.GetTypeCode(type) switch {
+            TypeCode.Decimal or TypeCode.Double or TypeCode.Single => true,
             _ => false
         };
 
@@ -88,10 +88,10 @@ public static class NumberMath {
     /// <item> <see langword="null"/> if <paramref name="type"/> is not a numeric type </item>
     /// </list>
     /// </returns>
-    public static s.Type? ToFloatingPoint(this s.Type type) {
+    public static Type? ToFloatingPoint(this Type type) {
         if (!type.IsNumericType()) return null;
         if (type.IsFloatingPoint()) return type;
-        return s.Runtime.InteropServices.Marshal.SizeOf(type) <= 32
+        return S.Runtime.InteropServices.Marshal.SizeOf(type) <= 32
             ? typeof(float) : typeof(double);
     }
     /// <summary> Get the integer type equivelant to <paramref name="type"/> </summary>
@@ -103,52 +103,52 @@ public static class NumberMath {
     /// <item> <see langword="null"/> if <paramref name="type"/> is not a numeric type </item>
     /// </list>
     /// </returns>
-    public static s.Type? ToInteger(this s.Type type) {
+    public static Type? ToInteger(this Type type) {
         if (!type.IsNumericType()) return null;
         if (!type.IsFloatingPoint()) return type;
-        return s.Runtime.InteropServices.Marshal.SizeOf(type) >= 64
+        return S.Runtime.InteropServices.Marshal.SizeOf(type) >= 64
             ? typeof(long) : typeof(int);
     }
 }
 
-/// <summary> A special clone of <see cref="s.Math"/> that supports <see cref="Number{T}"/> which respects <typeparamref name="T"/>
-/// <br/> instead of using the 1st function override found in <see cref="s.Math"/> (usually <see cref="sbyte"/>)
+/// <summary> A special clone of <see cref="S.Math"/> that supports <see cref="Number{T}"/> which respects <typeparamref name="T"/>
+/// <br/> instead of using the 1st function override found in <see cref="S.Math"/> (usually <see cref="sbyte"/>)
 /// <br/> + More features </summary>
 /// <typeparam name="T"></typeparam>
 public static class NumberMath<T>
         where T :
             struct,
-            s.IComparable, s.IComparable<T>,
-            s.IConvertible, s.IEquatable<T>,
-            s.ISpanFormattable {
+            IComparable, IComparable<T>,
+            IConvertible, IEquatable<T>,
+            ISpanFormattable {
 
-    public static Number<T> One => new((T)s.Convert.ChangeType(1, typeof(T)));
-    public static Number<T> Zero => new((T)s.Convert.ChangeType(0, typeof(T)));
-    public static Number<T> MinusOne => new((T)s.Convert.ChangeType(-1, typeof(T)));
+    public static Number<T> One => new((T)Convert.ChangeType(1, typeof(T)));
+    public static Number<T> Zero => new((T)Convert.ChangeType(0, typeof(T)));
+    public static Number<T> MinusOne => new((T)Convert.ChangeType(-1, typeof(T)));
     /// <summary> Allowed types: <br/>
     /// <see cref="float"/>, <see cref="double"/>, <see cref="decimal"/>
     /// <br/> otherwise, returns 0 </summary>
     public static Number<T> NegativeInfinity
-        => s.Type.GetTypeCode(typeof(T)) switch {
-            s.TypeCode.Single => (T)(object)float.NegativeInfinity,
-            s.TypeCode.Double => (T)(object)double.NegativeInfinity,
-            s.TypeCode.Decimal => (T)(object)(-1m / 0.000000000000000000000000001m),
+        => Type.GetTypeCode(typeof(T)) switch {
+            TypeCode.Single => (T)(object)float.NegativeInfinity,
+            TypeCode.Double => (T)(object)double.NegativeInfinity,
+            TypeCode.Decimal => (T)(object)(-1m / 0.000000000000000000000000001m),
             _ => (T)(object)0
         };
     /// <summary> Allowed types: <br/>
     /// <see cref="float"/>, <see cref="double"/>, <see cref="decimal"/>
     /// <br/> otherwise, returns 0 </summary>
     public static Number<T> PositiveInfinity
-        => s.Type.GetTypeCode(typeof(T)) switch {
-            s.TypeCode.Single => (T)(object)float.PositiveInfinity,
-            s.TypeCode.Double => (T)(object)double.PositiveInfinity,
-            s.TypeCode.Decimal => (T)(object)(1m / 0.000000000000000000000000001m),
+        => Type.GetTypeCode(typeof(T)) switch {
+            TypeCode.Single => (T)(object)float.PositiveInfinity,
+            TypeCode.Double => (T)(object)double.PositiveInfinity,
+            TypeCode.Decimal => (T)(object)(1m / 0.000000000000000000000000001m),
             _ => (T)(object)0
         };
 
     public static bool CanUseAsNumericValue() => NumberMath.CanUseAsNumericValue(typeof(T));
-    public static s.Type? ToFloatingPoint() => NumberMath.ToFloatingPoint(typeof(T));
-    public static s.Type? ToInteger() => NumberMath.ToInteger(typeof(T));
+    public static Type? ToFloatingPoint() => NumberMath.ToFloatingPoint(typeof(T));
+    public static Type? ToInteger() => NumberMath.ToInteger(typeof(T));
 
 
     /// <summary> Allowed types: <br/>
@@ -157,14 +157,14 @@ public static class NumberMath<T>
     /// <see cref="float"/>, <see cref="double"/>, <see cref="decimal"/>
     /// </summary>
     public static Number<T> Abs(Number<T> x)
-        => s.Type.GetTypeCode(typeof(T)) switch {
-            s.TypeCode.SByte => (T)(object)s.Math.Abs(x.SByte),
-            s.TypeCode.Int16 => (T)(object)s.Math.Abs(x.Int16),
-            s.TypeCode.Int32 => (T)(object)s.Math.Abs(x.Int32),
-            s.TypeCode.Int64 => (T)(object)s.Math.Abs(x.Int64),
-            s.TypeCode.Single => (T)(object)s.Math.Abs(x.Single),
-            s.TypeCode.Double => (T)(object)s.Math.Abs(x.Double),
-            _ => (T)(object)s.Math.Abs(x.Decimal)
+        => Type.GetTypeCode(typeof(T)) switch {
+            TypeCode.SByte => (T)(object)S.Math.Abs(x.SByte),
+            TypeCode.Int16 => (T)(object)S.Math.Abs(x.Int16),
+            TypeCode.Int32 => (T)(object)S.Math.Abs(x.Int32),
+            TypeCode.Int64 => (T)(object)S.Math.Abs(x.Int64),
+            TypeCode.Single => (T)(object)S.Math.Abs(x.Single),
+            TypeCode.Double => (T)(object)S.Math.Abs(x.Double),
+            _ => (T)(object)S.Math.Abs(x.Decimal)
         };
     ///// <summary> Allowed types: <br/>
     ///// <see cref="double"/> </summary>
@@ -196,9 +196,9 @@ public static class NumberMath<T>
     /// <summary> Allowed types: <br/>
     /// <see cref="decimal"/> <see cref="double"/>
     public static Number<T> Ceiling(Number<T> x)
-        => s.Type.GetTypeCode(typeof(T)) switch {
-            s.TypeCode.Double => (T)(object)s.Math.Ceiling(x.Double),
-            _ => (T)(object)s.Math.Ceiling(x.Decimal)
+        => Type.GetTypeCode(typeof(T)) switch {
+            TypeCode.Double => (T)(object)S.Math.Ceiling(x.Double),
+            _ => (T)(object)S.Math.Ceiling(x.Decimal)
         };
     /// <summary> Allowed types: <br/>
     /// <see cref="sbyte"/>, <see cref="byte"/>,
@@ -208,18 +208,18 @@ public static class NumberMath<T>
     /// <see cref="float"/>, <see cref="double"/>, <see cref="decimal"/>
     /// </summary>
     public static Number<T> Clamp(Number<T> x, Number<T> min, Number<T> max)
-        => s.Type.GetTypeCode(typeof(T)) switch {
-            s.TypeCode.SByte => (T)(object)s.Math.Clamp(x.SByte, min.SByte, max.SByte),
-            s.TypeCode.Byte => (T)(object)s.Math.Clamp(x.Byte, min.Byte, max.Byte),
-            s.TypeCode.Int16 => (T)(object)s.Math.Clamp(x.Int16, min.Int16, max.Int16),
-            s.TypeCode.UInt16 => (T)(object)s.Math.Clamp(x.UInt16, min.UInt16, max.UInt16),
-            s.TypeCode.Int32 => (T)(object)s.Math.Clamp(x.Int32, min.Int32, max.Int32),
-            s.TypeCode.UInt32 => (T)(object)s.Math.Clamp(x.UInt32, min.UInt32, max.UInt32),
-            s.TypeCode.Int64 => (T)(object)s.Math.Clamp(x.Int64, min.Int64, max.Int64),
-            s.TypeCode.UInt64 => (T)(object)s.Math.Clamp(x.UInt64, min.UInt64, max.UInt64),
-            s.TypeCode.Single => (T)(object)s.Math.Clamp(x.Single, min.Single, max.Single),
-            s.TypeCode.Double => (T)(object)s.Math.Clamp(x.Double, min.Double, max.Double),
-            _ => (T)(object)s.Math.Clamp(x.Decimal, min.Decimal, max.Decimal)
+        => Type.GetTypeCode(typeof(T)) switch {
+            TypeCode.SByte => (T)(object)S.Math.Clamp(x.SByte, min.SByte, max.SByte),
+            TypeCode.Byte => (T)(object)S.Math.Clamp(x.Byte, min.Byte, max.Byte),
+            TypeCode.Int16 => (T)(object)S.Math.Clamp(x.Int16, min.Int16, max.Int16),
+            TypeCode.UInt16 => (T)(object)S.Math.Clamp(x.UInt16, min.UInt16, max.UInt16),
+            TypeCode.Int32 => (T)(object)S.Math.Clamp(x.Int32, min.Int32, max.Int32),
+            TypeCode.UInt32 => (T)(object)S.Math.Clamp(x.UInt32, min.UInt32, max.UInt32),
+            TypeCode.Int64 => (T)(object)S.Math.Clamp(x.Int64, min.Int64, max.Int64),
+            TypeCode.UInt64 => (T)(object)S.Math.Clamp(x.UInt64, min.UInt64, max.UInt64),
+            TypeCode.Single => (T)(object)S.Math.Clamp(x.Single, min.Single, max.Single),
+            TypeCode.Double => (T)(object)S.Math.Clamp(x.Double, min.Double, max.Double),
+            _ => (T)(object)S.Math.Clamp(x.Decimal, min.Decimal, max.Decimal)
         };
 
     ///// <summary> Allowed types: <br/>
@@ -232,19 +232,19 @@ public static class NumberMath<T>
     /// <see cref="int"/>, <see cref="long"/> </summary>
     public static Number<T> DivRem(Number<T> x, Number<T> y, out Number<T> result) {
         Number<T> returnValue;
-        switch (s.Type.GetTypeCode(typeof(T))) {
-        case s.TypeCode.Int32:
-            int outValue_int;
-            int value_int = s.Math.DivRem(x.Int32, y.Int32, out outValue_int);
-            result = (T)(object)outValue_int;
-            returnValue = (T)(object)value_int;
-            break;
-        default:
-            long outValue_long;
-            long value_long = s.Math.DivRem(x.Int64, y.Int64, out outValue_long);
-            result = (T)(object)outValue_long;
-            returnValue = (T)(object)value_long;
-            break;
+        switch (Type.GetTypeCode(typeof(T))) {
+            case TypeCode.Int32:
+                int outValue_int;
+                int value_int = S.Math.DivRem(x.Int32, y.Int32, out outValue_int);
+                result = (T)(object)outValue_int;
+                returnValue = (T)(object)value_int;
+                break;
+            default:
+                long outValue_long;
+                long value_long = S.Math.DivRem(x.Int64, y.Int64, out outValue_long);
+                result = (T)(object)outValue_long;
+                returnValue = (T)(object)value_long;
+                break;
         }
         return returnValue;
     }
@@ -274,18 +274,18 @@ public static class NumberMath<T>
     /// <see cref="float"/>, <see cref="double"/>, <see cref="decimal"/>
     /// </summary>
     public static Number<T> Max(Number<T> x, Number<T> y)
-        => s.Type.GetTypeCode(typeof(T)) switch {
-            s.TypeCode.SByte => (T)(object)s.Math.Max(x.SByte, y.SByte),
-            s.TypeCode.Byte => (T)(object)s.Math.Max(x.Byte, y.Byte),
-            s.TypeCode.Int16 => (T)(object)s.Math.Max(x.Int16, y.Int16),
-            s.TypeCode.UInt16 => (T)(object)s.Math.Max(x.UInt16, y.UInt16),
-            s.TypeCode.Int32 => (T)(object)s.Math.Max(x.Int32, y.Int32),
-            s.TypeCode.UInt32 => (T)(object)s.Math.Max(x.UInt32, y.UInt32),
-            s.TypeCode.Int64 => (T)(object)s.Math.Max(x.Int64, y.Int64),
-            s.TypeCode.UInt64 => (T)(object)s.Math.Max(x.UInt64, y.UInt64),
-            s.TypeCode.Single => (T)(object)s.Math.Max(x.Single, y.Single),
-            s.TypeCode.Double => (T)(object)s.Math.Max(x.Double, y.Double),
-            _ => (T)(object)s.Math.Max(x.Decimal, y.Decimal)
+        => Type.GetTypeCode(typeof(T)) switch {
+            TypeCode.SByte => (T)(object)S.Math.Max(x.SByte, y.SByte),
+            TypeCode.Byte => (T)(object)S.Math.Max(x.Byte, y.Byte),
+            TypeCode.Int16 => (T)(object)S.Math.Max(x.Int16, y.Int16),
+            TypeCode.UInt16 => (T)(object)S.Math.Max(x.UInt16, y.UInt16),
+            TypeCode.Int32 => (T)(object)S.Math.Max(x.Int32, y.Int32),
+            TypeCode.UInt32 => (T)(object)S.Math.Max(x.UInt32, y.UInt32),
+            TypeCode.Int64 => (T)(object)S.Math.Max(x.Int64, y.Int64),
+            TypeCode.UInt64 => (T)(object)S.Math.Max(x.UInt64, y.UInt64),
+            TypeCode.Single => (T)(object)S.Math.Max(x.Single, y.Single),
+            TypeCode.Double => (T)(object)S.Math.Max(x.Double, y.Double),
+            _ => (T)(object)S.Math.Max(x.Decimal, y.Decimal)
         };
     /// <summary> Allowed types: <br/>
     /// <see cref="sbyte"/>, <see cref="byte"/>,
@@ -295,49 +295,49 @@ public static class NumberMath<T>
     /// <see cref="float"/>, <see cref="double"/>, <see cref="decimal"/>
     /// </summary>
     public static Number<T> Min(Number<T> x, Number<T> y)
-        => s.Type.GetTypeCode(typeof(T)) switch {
-            s.TypeCode.SByte => (T)(object)s.Math.Min(x.SByte, y.SByte),
-            s.TypeCode.Byte => (T)(object)s.Math.Min(x.Byte, y.Byte),
-            s.TypeCode.Int16 => (T)(object)s.Math.Min(x.Int16, y.Int16),
-            s.TypeCode.UInt16 => (T)(object)s.Math.Min(x.UInt16, y.UInt16),
-            s.TypeCode.Int32 => (T)(object)s.Math.Min(x.Int32, y.Int32),
-            s.TypeCode.UInt32 => (T)(object)s.Math.Min(x.UInt32, y.UInt32),
-            s.TypeCode.Int64 => (T)(object)s.Math.Min(x.Int64, y.Int64),
-            s.TypeCode.UInt64 => (T)(object)s.Math.Min(x.UInt64, y.UInt64),
-            s.TypeCode.Single => (T)(object)s.Math.Min(x.Single, y.Single),
-            s.TypeCode.Double => (T)(object)s.Math.Min(x.Double, y.Double),
-            _ => (T)(object)s.Math.Min(x.Decimal, y.Decimal)
+        => Type.GetTypeCode(typeof(T)) switch {
+            TypeCode.SByte => (T)(object)S.Math.Min(x.SByte, y.SByte),
+            TypeCode.Byte => (T)(object)S.Math.Min(x.Byte, y.Byte),
+            TypeCode.Int16 => (T)(object)S.Math.Min(x.Int16, y.Int16),
+            TypeCode.UInt16 => (T)(object)S.Math.Min(x.UInt16, y.UInt16),
+            TypeCode.Int32 => (T)(object)S.Math.Min(x.Int32, y.Int32),
+            TypeCode.UInt32 => (T)(object)S.Math.Min(x.UInt32, y.UInt32),
+            TypeCode.Int64 => (T)(object)S.Math.Min(x.Int64, y.Int64),
+            TypeCode.UInt64 => (T)(object)S.Math.Min(x.UInt64, y.UInt64),
+            TypeCode.Single => (T)(object)S.Math.Min(x.Single, y.Single),
+            TypeCode.Double => (T)(object)S.Math.Min(x.Double, y.Double),
+            _ => (T)(object)S.Math.Min(x.Decimal, y.Decimal)
         };
     ///// <summary> Allowed types: <br/>
     ///// <see cref="double"/> </summary>
     //public static Number<T> Pow(Number<T> x, Number<T> y) => s.Math.Pow(x.Double, y.Double);
     /// <summary> Allowed types: <br/>
     /// <see cref="double"/>, <see cref="decimal"/> </summary>
-    public static Number<T> Round(Number<T> x, s.MidpointRounding mode)
-        => s.Type.GetTypeCode(typeof(T)) switch {
-            s.TypeCode.Double => (T)(object)s.Math.Round(x.Double, mode),
-            _ => (T)(object)s.Math.Round(x.Decimal, mode)
+    public static Number<T> Round(Number<T> x, MidpointRounding mode)
+        => Type.GetTypeCode(typeof(T)) switch {
+            TypeCode.Double => (T)(object)S.Math.Round(x.Double, mode),
+            _ => (T)(object)S.Math.Round(x.Decimal, mode)
         };
     /// <summary> Allowed types: <br/>
     /// <see cref="double"/>, <see cref="decimal"/> </summary>
-    public static Number<T> Round(Number<T> x, int digits, s.MidpointRounding mode)
-        => s.Type.GetTypeCode(typeof(T)) switch {
-            s.TypeCode.Double => (T)(object)s.Math.Round(x.Double, digits, mode),
-            _ => (T)(object)s.Math.Round(x.Decimal, digits, mode)
+    public static Number<T> Round(Number<T> x, int digits, MidpointRounding mode)
+        => Type.GetTypeCode(typeof(T)) switch {
+            TypeCode.Double => (T)(object)S.Math.Round(x.Double, digits, mode),
+            _ => (T)(object)S.Math.Round(x.Decimal, digits, mode)
         };
     /// <summary> Allowed types: <br/>
     /// <see cref="double"/>, <see cref="decimal"/> </summary>
     public static Number<T> Round(Number<T> x, int digits)
-        => s.Type.GetTypeCode(typeof(T)) switch {
-            s.TypeCode.Double => (T)(object)s.Math.Round(x.Double, digits),
-            _ => (T)(object)s.Math.Round(x.Decimal, digits)
+        => Type.GetTypeCode(typeof(T)) switch {
+            TypeCode.Double => (T)(object)S.Math.Round(x.Double, digits),
+            _ => (T)(object)S.Math.Round(x.Decimal, digits)
         };
     /// <summary> Allowed types: <br/>
     /// <see cref="double"/>, <see cref="decimal"/> </summary>
     public static Number<T> Round(Number<T> x)
-        => s.Type.GetTypeCode(typeof(T)) switch {
-            s.TypeCode.Double => (T)(object)s.Math.Round(x.Double),
-            _ => (T)(object)s.Math.Round(x.Decimal)
+        => Type.GetTypeCode(typeof(T)) switch {
+            TypeCode.Double => (T)(object)S.Math.Round(x.Double),
+            _ => (T)(object)S.Math.Round(x.Decimal)
         };
     /// <summary> Allowed types: <br/>
     /// <see cref="sbyte"/>, <see cref="short"/>,
@@ -345,14 +345,14 @@ public static class NumberMath<T>
     /// <see cref="float"/>, <see cref="double"/>, <see cref="decimal"/>
     /// </summary>
     public static int Sign(Number<T> x)
-        => s.Type.GetTypeCode(typeof(T)) switch {
-            s.TypeCode.SByte => s.Math.Sign(x.SByte),
-            s.TypeCode.Int16 => s.Math.Sign(x.Int16),
-            s.TypeCode.Int32 => s.Math.Sign(x.Int32),
-            s.TypeCode.Int64 => s.Math.Sign(x.Int64),
-            s.TypeCode.Single => s.Math.Sign(x.Single),
-            s.TypeCode.Double => s.Math.Sign(x.Double),
-            _ => s.Math.Sign(x.Decimal)
+        => Type.GetTypeCode(typeof(T)) switch {
+            TypeCode.SByte => S.Math.Sign(x.SByte),
+            TypeCode.Int16 => S.Math.Sign(x.Int16),
+            TypeCode.Int32 => S.Math.Sign(x.Int32),
+            TypeCode.Int64 => S.Math.Sign(x.Int64),
+            TypeCode.Single => S.Math.Sign(x.Single),
+            TypeCode.Double => S.Math.Sign(x.Double),
+            _ => S.Math.Sign(x.Decimal)
         };
     ///// <summary> Allowed types: <br/>
     ///// <see cref="double"/> </summary>
@@ -372,9 +372,9 @@ public static class NumberMath<T>
     /// <summary> Allowed types: <br/>
     /// <see cref="double"/>, <see cref="decimal"/> </summary>
     public static Number<T> Truncate(Number<T> x)
-        => s.Type.GetTypeCode(typeof(T)) switch {
-            s.TypeCode.Double => (T)(object)s.Math.Truncate(x.Double),
-            _ => (T)(object)s.Math.Truncate(x.Decimal)
+        => Type.GetTypeCode(typeof(T)) switch {
+            TypeCode.Double => (T)(object)S.Math.Truncate(x.Double),
+            _ => (T)(object)S.Math.Truncate(x.Decimal)
         };
 
 
