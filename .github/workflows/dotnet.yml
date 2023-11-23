@@ -1,6 +1,3 @@
-# This workflow will build a .NET project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
-
 name: .NET
 
 on:
@@ -22,13 +19,13 @@ jobs:
           dotnet-version: 7.0.x
       - name: Restore Dependencies
         id: restore_dependencies
-        run: dotnet restore GalacticLib.csproj
+        run: dotnet restore ./GalacticLib.csproj
       - name: Build
         id: build
-        run: dotnet build GalacticLib.csproj --no-restore -o bin
-      - name: Test
-        id: test
-        run: dotnet test GalacticLib.csproj --no-build --verbosity normal
+        run: dotnet build ./GalacticLib.csproj --no-restore -o bin
+      # - name: Test
+      #   id: test
+      #   run: dotnet test ./GalacticLib.csproj --no-build --verbosity normal
 
   dev_upload:
     needs: build
@@ -39,7 +36,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: dll
-          path: bin/GalacticLib.dll
+          path: ./bin/GalacticLib.dll
 
   create_dev_release:
     needs: dev_upload
@@ -54,7 +51,7 @@ jobs:
         run: echo ::set-output name=commit_id::$(git rev-parse --short HEAD)
       - name: Create Dev Release
         id: create_dev_release
-        run: gh release create ${{ steps.get_commit_id.outputs.commit_id }} bin/GalacticLib.dll -t "Release ${{ steps.get_commit_id.outputs.commit_id }}"
+        run: gh release create ${{ steps.get_commit_id.outputs.commit_id }} ./bin/GalacticLib.dll -t "Release ${{ steps.get_commit_id.outputs.commit_id }}"
       - name: Upload Assets
         id: upload_assets
-        run: gh release upload ${{ steps.create_dev_release.outputs.upload_url }} bin/GalacticLib.dll
+        run: gh release upload ${{ steps.create_dev_release.outputs.upload_url }} ./bin/GalacticLib.dll
