@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using static System.Math;
 
 namespace GalacticLib.Math.Numerics;
@@ -32,7 +32,7 @@ public class SymmetricNormalGrid {
     /// <summary> Get a value at <paramref name="x"/>,<paramref name="y"/> coordinates </summary>
     public double Value(int x, int y) => _Values[x, y];
     public SymmetricNormalGrid(int size, double spread) {
-        if (size <= 0) throw new ArgumentOutOfRangeException(nameof(size));
+        if (size <= 0) throw new ArgumentOutOfRangeException(nameof(size), "Size must be >0");
         Size = size;
         Mean = (Size - 1) / 2f; //!? no need for 64bit, it is either x.0 or x.5
         Spread = spread;
