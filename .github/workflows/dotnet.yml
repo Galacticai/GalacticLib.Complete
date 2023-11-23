@@ -30,13 +30,13 @@ jobs:
         id: test
         run: dotnet test GalacticLib.Complete.sln --no-build --verbosity normal
 
-  release:
+  dev_release:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Dev Build
-        id: dev_build
-        uses: softprops/action-gh-release@latest
+      - name: Dev Release
+        id: dev_release
+        uses: softprops/action-gh-release@0.1.15
         with:
           files: |
             ./bin/Debug/net7.0/GalacticLib.dll
