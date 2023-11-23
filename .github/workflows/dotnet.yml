@@ -22,13 +22,13 @@ jobs:
           dotnet-version: 7.0.x
       - name: Restore Dependencies
         id: restore_dependencies
-        run: dotnet restore GalacticLib.Complete.csproj
+        run: dotnet restore GalacticLib.csproj
       - name: Build
         id: build
-        run: dotnet build GalacticLib.Complete.csproj --no-restore -o bin
+        run: dotnet build GalacticLib.csproj --no-restore -o bin
       - name: Test
         id: test
-        run: dotnet test GalacticLib.Complete.csproj --no-build --verbosity normal
+        run: dotnet test GalacticLib.csproj --no-build --verbosity normal
 
   dev_release:
     needs: build
@@ -47,7 +47,7 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
-      - name: Get Version from csproj
+      - name: Get commit ID
         id: get_commit_id
         run: echo ::set-output name=commit_id::$(git rev-parse --short HEAD)
       - name: Create Dev Release
