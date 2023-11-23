@@ -5,36 +5,42 @@ name: .NET
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ["master"]
   pull_request:
-    branches: [ "master" ]
+    branches: ["master"]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: 6.0.x
-    - name: Restore dependencies
-      run: dotnet restore GalacticLib.Complete.sln
-    - name: Build
-      run: dotnet build GalacticLib.Complete.sln --no-restore
-    - name: Test
-      run: dotnet test GalacticLib.Complete.sln --no-build --verbosity normal
-    - name: Prerelease
-      run: |
-          echo "done!"
-    - uses: "marvinpinto/action-automatic-releases@latest"
-      with:
-        repo_token: "${{ secrets.GITHUB_TOKEN }}"
-        automatic_release_tag: "latest"
-        prerelease: true
-        title: "Development Build"
-        files: |
-          LICENSE.txt
-          *.cs
+      - uses: actions/checkout@v3
+      - name: Setup .NET
+        id: setup_dotnet
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 7.0.x
+      - name: Restore Dependencies
+        id: restore_dependencies
+        run: dotnet restore GalacticLib.Complete.sln
+      - name: Build
+        id: build
+        run: dotnet build GalacticLib.Complete.sln --no-restore
+      - name: Test
+        id: test
+        run: dotnet test GalacticLib.Complete.sln --no-build --verbosity normal
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dev Build
+        id: dev_build
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            ./bin/Debug/net7.0/GalacticLib.dll
+          token: ${{ secrets.GITHUB_TOKEN }}
+          release_name: dev ${{ github.sha }}
+          draft: false
+          prerelease: true
