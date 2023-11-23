@@ -38,10 +38,10 @@ jobs:
         id: dev_release
         uses: softprops/action-gh-release@v1
         with:
+          tag_name: dev
+          name: dev ${{ github.sha }}
+          prerelease: true
+          token: ${{ secrets.GITHUB_TOKEN }}
           files: |
             ./bin/Debug/net7.0/GalacticLib.dll
             ./LICENSE
-          token: ${{ secrets.GITHUB_TOKEN }}
-          release_name: dev ${{ github.sha }}
-          draft: false
-          prerelease: true
