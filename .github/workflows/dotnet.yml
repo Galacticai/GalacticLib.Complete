@@ -26,3 +26,15 @@ jobs:
       run: dotnet build GalacticLib.Complete.sln --no-restore
     - name: Test
       run: dotnet test GalacticLib.Complete.sln --no-build --verbosity normal
+    - name: Prerelease
+      run: |
+          echo "done!"
+    - uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "latest"
+        prerelease: true
+        title: "Development Build"
+        files: |
+          LICENSE.txt
+          *.cs
