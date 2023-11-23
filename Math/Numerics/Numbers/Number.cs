@@ -215,12 +215,10 @@ public readonly struct Number {
     #endregion
     #region Overrides
 
-#nullable enable
     /// <summary> Check whether an <paramref name="obj"/> is equal to this <see cref="Number"/> </summary>
     /// <returns> <see cref="true"/> if <paramref name="obj"/> is a <see cref="Number"/> that's is equal to this <see cref="Number"/></returns>
     public override bool Equals(object? obj)
-        => obj != null && Value.Equals(obj);
-#nullable restore
+        => obj is not null && Value.Equals(obj);
     /// <summary> HashCode of <see cref="Value"/> </summary>
     public override int GetHashCode()
         => Value.GetHashCode();
