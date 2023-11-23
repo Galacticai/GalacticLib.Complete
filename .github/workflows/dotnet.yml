@@ -22,24 +22,37 @@ jobs:
           dotnet-version: 7.0.x
       - name: Restore Dependencies
         id: restore_dependencies
-        run: dotnet restore GalacticLib.Complete.sln
+        run: dotnet restore GalacticLib.Complete.csproj
       - name: Build
         id: build
-        run: dotnet build GalacticLib.Complete.sln --no-restore -o bin/Debug/
+        run: dotnet build GalacticLib.Complete.csproj --no-restore -o bin
       - name: Test
         id: test
-        run: dotnet test GalacticLib.Complete.sln --no-build --verbosity normal
+        run: dotnet test GalacticLib.Complete.csproj --no-build --verbosity normal
 
   dev_release:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-        name: Development Release
-        id: dev_release
-      - run: mkdir -p bin
-      - run: dotnet build GalacticLib.Complete.sln -o bin/Debug/
+      - name: Checkout Code
+        uses: actions/checkout@v3
       - uses: actions/upload-artifact@v3
         with:
           name: dll
           path: bin/GalacticLib.dll
+
+  create_dev_release:
+    needs: dev_release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - name: Get Version from csproj
+        id: get_commit_id
+        run: echo ::set-output name=commit_id::$(git rev-parse --short HEAD)
+      - name: Create Dev Release
+        id: create_dev_release
+        run: gh release create ${{ steps.get_commit_id.outputs.commit_id }} bin/Debug/GalacticLib.dll -t "Release ${{ steps.get_commit_id.outputs.commit_id }}"
+      - name: Upload Assets
+        id: upload_assets
+        run: gh release upload ${{ steps.create_dev_release.outputs.upload_url }} bin/GalacticLib.dll
