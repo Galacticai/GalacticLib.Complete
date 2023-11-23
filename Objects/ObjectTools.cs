@@ -1,4 +1,4 @@
-﻿// —————————————————————————————————————————————
+// —————————————————————————————————————————————
 //?
 //!? 📜 Objects.cs
 //!? 🖋️ Galacticai 📅 2022
@@ -55,10 +55,10 @@ public static class ObjectTools {
         return obj;
     }
 
-    /// <summary> Check if <paramref name="@enum" /> is matching one of <paramref name="@enums" /> </summary>
-    public static bool Is<TEnum>(this TEnum @enum, params TEnum[] enums)
+    /// <summary> Check if <paramref name="en" /> is matching one of <paramref name="enums" /> </summary>
+    public static bool Is<TEnum>(this TEnum en, params TEnum[] enums)
             where TEnum : Enum
-        => enums.Any(item => item.Equals(@enum));
+        => enums.Any(item => item.Equals(en));
 
 
     /// <summary> Parse <paramref name="fieldName" /> <see cref="string" /> into <typeparamref name="TEnum" /> </summary>
