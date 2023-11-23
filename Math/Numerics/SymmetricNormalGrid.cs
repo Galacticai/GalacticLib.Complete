@@ -44,21 +44,26 @@ public class SymmetricNormalGrid {
 
         for (int x = 0; x <= halfSize; x++) {
             int xMirror = Size - 1 - x;
-            double xDistanceP2 = Pow(x - Mean, 2);
+            double xDistanceSquare = Pow(x - Mean, 2);
+
             for (int y = x; y <= halfSize; y++) {
                 int yMirror = Size - 1 - y;
-                double yDistanceP2 = Pow(y - Mean, 2);
-                double value = Exp(-(xDistanceP2 + yDistanceP2) / spreadSquareTimes2);
+                double yDistanceSquare = Pow(y - Mean, 2);
+
+                //? Value of cell at x,y
+                double value = Exp(-(xDistanceSquare + yDistanceSquare) / spreadSquareTimes2);
+
                 _Values[x, y] = value; // Half quadrant #1
                 _Values[xMirror, y] = value; // HQ3
                 _Values[x, yMirror] = value; // HQ5
                 _Values[xMirror, yMirror] = value; // HQ7
-                if (x != y) {
-                    _Values[y, x] = value; // HQ2
-                    _Values[yMirror, x] = value; // HQ4
-                    _Values[y, xMirror] = value; // HQ6
-                    _Values[yMirror, xMirror] = value; // HQ8
-                }
+
+                if (x == y) continue; //? skip diagonals
+
+                _Values[y, x] = value; // HQ2
+                _Values[yMirror, x] = value; // HQ4
+                _Values[y, xMirror] = value; // HQ6
+                _Values[yMirror, xMirror] = value; // HQ8
             }
         }
     }
