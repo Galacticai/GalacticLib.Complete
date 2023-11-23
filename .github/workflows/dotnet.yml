@@ -25,7 +25,7 @@ jobs:
         run: dotnet restore GalacticLib.Complete.sln
       - name: Build
         id: build
-        run: dotnet build GalacticLib.Complete.sln --no-restore
+        run: dotnet build GalacticLib.Complete.sln --no-restore -o bin/Debug/
       - name: Test
         id: test
         run: dotnet test GalacticLib.Complete.sln --no-build --verbosity normal
@@ -34,14 +34,12 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Dev Release
+      - uses: actions/checkout@v3
+        name: Development Release
         id: dev_release
-        uses: softprops/action-gh-release@v1
+      - run: mkdir -p bin
+      - run: dotnet build GalacticLib.Complete.sln -o bin/Debug/
+      - uses: actions/upload-artifact@v3
         with:
-          tag_name: dev
-          name: dev ${{ github.sha }}
-          prerelease: true
-          token: ${{ secrets.GITHUB_TOKEN }}
-          files: |
-            ./bin/Debug/net7.0/GalacticLib.dll
-            ./LICENSE
+          name: dll
+          path: bin/GalacticLib.dll
