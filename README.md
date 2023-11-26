@@ -1,6 +1,10 @@
 ﻿# GalacticLib
 ## Family of .NET libraries packed as nuget packages
 
+<a href="https://github.com/Galacticai/GalacticLib.Complete/actions">
+    <img src="https://img.shields.io/github/actions/workflow/status/Galacticai/GalacticLib.Complete/dotnet.yml?branch=master&label=Build&logo=dotnet" />
+</a>
+
 This repository includes all child packages directly instead of referencing their nugets (faster updates) ... Unlike [GalacticLib](https://github.com/Galacticai/GalacticLib) which references the child nuget packages 
 #### ❔ What to use? 
  - For flexibility: you should use specific child packages listed below instead of the full GalacticLib package.
