@@ -27,31 +27,31 @@ jobs:
       #   id: test
       #   run: dotnet test ./GalacticLib.csproj --no-build --verbosity normal
 
-  dev_upload:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-      - uses: actions/upload-artifact@v3
-        with:
-          name: dll
-          path: ./bin/GalacticLib.dll
+  # dev_upload:
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout Code
+  #       uses: actions/checkout@v3
+  #     - uses: actions/upload-artifact@v3
+  #       with:
+  #         name: dll
+  #         path: ./bin/GalacticLib.dll
 
-  create_dev_release:
-    needs: dev_upload
-    runs-on: ubuntu-latest
-    env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-      - name: Get commit ID
-        id: get_commit_id
-        run: echo ::set-output name=commit_id::$(git rev-parse --short HEAD)
-      - name: Create Dev Release
-        id: create_dev_release
-        run: gh release create ${{ steps.get_commit_id.outputs.commit_id }} ./bin/GalacticLib.dll -t "Release ${{ steps.get_commit_id.outputs.commit_id }}"
-      - name: Upload Assets
-        id: upload_assets
-        run: gh release upload ${{ steps.create_dev_release.outputs.upload_url }} ./bin/GalacticLib.dll
+  # create_dev_release:
+  #   needs: dev_upload
+  #   runs-on: ubuntu-latest
+  #   env:
+  #     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #   steps:
+  #     - name: Checkout Code
+  #       uses: actions/checkout@v3
+  #     - name: Get commit ID
+  #       id: get_commit_id
+  #       run: echo ::set-output name=commit_id::$(git rev-parse --short HEAD)
+  #     - name: Create Dev Release
+  #       id: create_dev_release
+  #       run: gh release create ${{ steps.get_commit_id.outputs.commit_id }} ./bin/GalacticLib.dll -t "Release ${{ steps.get_commit_id.outputs.commit_id }}"
+  #     - name: Upload Assets
+  #       id: upload_assets
+  #       run: gh release upload ${{ steps.create_dev_release.outputs.upload_url }} ./bin/GalacticLib.dll
