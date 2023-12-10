@@ -22,7 +22,7 @@ public class TaskQueue<TKey, TValue> where TKey : IComparable<TKey> {
             int maxTaskDuration,
             SortedDictionary<TKey, FutureValue<TValue>> dictionary) {
         MaxTaskDuration = maxTaskDuration;
-        Dictionary = dictionary;
+        Queue = dictionary;
         RunningTasks = [];
     }
 
@@ -41,10 +41,10 @@ public class TaskQueue<TKey, TValue> where TKey : IComparable<TKey> {
     /// or <see cref="FutureValue{TValue}.NotFound"/> if <paramref name="key"/> doesn't exist
     /// </returns>
     public FutureValue<TValue> this[TKey key] {
-        get => Dictionary.TryGetValue(key, out var value)
+        get => Queue.TryGetValue(key, out var value)
             ? value
             : new FutureValue<TValue>.NotFound();
-        private set => Dictionary[key] = value;
+        private set => Queue[key] = value;
     }
 
     /// <summary> 
@@ -52,10 +52,11 @@ public class TaskQueue<TKey, TValue> where TKey : IComparable<TKey> {
     /// Once this elapses, the task gets cancelled and marked as <see cref="FutureValue{TValue}.TimedOut"/>
     /// </summary>
     public int MaxTaskDuration { get; }
-    private SortedDictionary<TKey, FutureValue<TValue>> Dictionary { get; }
+    private SortedDictionary<TKey, FutureValue<TValue>> Queue { get; }
     private Dictionary<string, (CancellationTokenSource CancelToken, Task<TValue> Task)> RunningTasks { get; }
 
     /// <summary> Count of tasks currently queued </summary>
+    public int Count => Queue.Count;
     /// <summary> Queue is empty </summary>
     public bool IsEmpty => Count == 0;
     /// <summary> Queue contains tasks </summary>
@@ -126,15 +127,16 @@ public class TaskQueue<TKey, TValue> where TKey : IComparable<TKey> {
 
     /// <summary> Check out the 1st key in queue </summary> 
     /// <returns> First key or null if queue is empty </returns>
-    public TKey? PeekKey() => Dictionary.FirstOrDefault().Key;
+    public TKey? PeekKey() => Queue.FirstOrDefault().Key;
 
     /// <summary> Check if <paramref name="key"/> exists in queue </summary>
     /// <param name="key"> Target <typeparamref name="TKey"/> </param>
     /// <returns> true if queu contains the <paramref name="key"/> </returns>
+    public bool ContainsKey(TKey key) => Queue.ContainsKey(key);
 
     /// <summary> Remove a task </summary> 
     /// <returns> true if removed </returns>
-    public bool Remove(TKey key) => Dictionary.Remove(key);
+    public bool Remove(TKey key) => Queue.Remove(key);
 
     /// <summary> Cancel all running tasks and clear the queue </summary>
     public void Clear() {
@@ -145,7 +147,7 @@ public class TaskQueue<TKey, TValue> where TKey : IComparable<TKey> {
                 RunningTasks.Remove(task.Key);
             }
         }
-        lock (Dictionary) Dictionary.Clear();
+        lock (Queue) Queue.Clear();
     }
 
 
