@@ -93,10 +93,12 @@ public class TaskQueue<TKey, TValue> where TKey : IComparable<TKey> {
             lock (RunningTasks) RunningTasks.Remove(id);
 
             this[key] = new FutureValue<TValue>.Finished(value);
+            DoNext();
 
         } catch (OperationCanceledException) {
             this[key] = new FutureValue<TValue>.TimedOut(MaxTaskDuration);
             //? no return because TimedOut is treated as Finished (skip) 
+            DoNext();
 
         } catch (Exception exception) {
             if (TaskError is null) throw;
@@ -104,7 +106,6 @@ public class TaskQueue<TKey, TValue> where TKey : IComparable<TKey> {
             return;
         }
 
-        DoNext();
     }
     private void DoNext() {
 
