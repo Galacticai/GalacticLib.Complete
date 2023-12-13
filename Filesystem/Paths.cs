@@ -26,8 +26,14 @@ public static class Paths {
     public static string ApplicationData
         => Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
     /// <summary> (ApplicationData)/(AppName) </summary>
-    public static string ThisApplicationData
-        => Path.Combine(ApplicationData, Assembly.GetExecutingAssembly().GetName().Name);
+    public static string? ThisApplicationData {
+        get {
+            AssemblyName assemblyName = Assembly.GetExecutingAssembly().GetName();
+            return assemblyName.Name is null
+                ? null
+                : Path.Combine(ApplicationData, assemblyName.Name);
+        }
+    }
 
     /// <summary> (<see cref="Environment.SpecialFolder.UserProfile"/>) </summary>
     public static string UserProfile
@@ -42,8 +48,12 @@ public static class Paths {
     #endregion
     #region Methods
 
+    /// <exception cref="IOException" /> 
     public static void Create_ThisApplicationData()
-        => new DirectoryInfo(ThisApplicationData).Create();
+        => new DirectoryInfo(
+            ThisApplicationData
+            ?? throw new IOException("Unable to get this app's assembly name")
+        ).Create();
 
     /// <summary> Get path slash according to current OS </summary>
     /// <returns> <list type="bullet">
@@ -101,13 +111,13 @@ public static class Paths {
         if (!path.PathIsValid()) return false;
 
         switch (path.GetPathType()) {
-        case PathType.File:
-            File.Delete(path);
-            return true;
-        case PathType.Directory:
-            Directory.Delete(path);
-            return true;
-        default: return false;
+            case PathType.File:
+                File.Delete(path);
+                return true;
+            case PathType.Directory:
+                Directory.Delete(path);
+                return true;
+            default: return false;
         }
     }
 
@@ -150,15 +160,15 @@ public static class Paths {
 
     public static bool PathIsRW(this string path) {
         switch (path.GetPathType()) {
-        case PathType.File:
-            return (File.GetAttributes(path) & FileAttributes.ReadOnly) == 0;
-        case PathType.Directory:
-            foreach (string entry in Directory.GetFileSystemEntries(path, "*", SearchOption.AllDirectories)) {
-                FileAttributes entryAttributes = File.GetAttributes(entry);
-                if ((entryAttributes & FileAttributes.ReadOnly) != 0) return false;
-            }
-            return true;
-        default: return false;
+            case PathType.File:
+                return (File.GetAttributes(path) & FileAttributes.ReadOnly) == 0;
+            case PathType.Directory:
+                foreach (string entry in Directory.GetFileSystemEntries(path, "*", SearchOption.AllDirectories)) {
+                    FileAttributes entryAttributes = File.GetAttributes(entry);
+                    if ((entryAttributes & FileAttributes.ReadOnly) != 0) return false;
+                }
+                return true;
+            default: return false;
         }
     }
 
