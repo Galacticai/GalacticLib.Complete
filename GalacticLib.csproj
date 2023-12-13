@@ -10,6 +10,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <Compile Remove="GalacticLib._Test\**" />
         <Compile Remove="Math\Space\**" />
         <EmbeddedResource Remove="Math\Space\**" />
         <None Remove="Math\Space\**" />
