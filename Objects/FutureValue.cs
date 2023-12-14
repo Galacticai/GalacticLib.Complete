@@ -1,6 +1,3 @@
-
-using GLib;
-
 namespace GalacticLib.Objects;
 
 public abstract record FutureValue<TValue> {
@@ -9,11 +6,15 @@ public abstract record FutureValue<TValue> {
     public sealed record Pending : FutureValue<TValue>;
 
     /// <summary> Running to get the value </summary>
-    public sealed record Running : FutureValue<TValue>;
+    public sealed record Running(DateTime StartedAt) : FutureValue<TValue>;
 
     /// <summary> <see cref="Value"/> was aquired </summary>
     /// <param name="Value"> The value that was aquired (could also be <see langword="default"/>) </param>
-    public sealed record Finished(TValue? Value) : FutureValue<TValue>;
+    public sealed record Finished(
+        TValue? Value,
+        DateTime? StartedAt = null,
+        TimeSpan? TimeSpan = null)
+            : FutureValue<TValue>;
 
     /// <summary> Something went wrong while getting the value </summary>
     public abstract record Failed : FutureValue<TValue> {
@@ -25,5 +26,4 @@ public abstract record FutureValue<TValue> {
         /// <param name="Exception"> <see cref="Exception"/> encountered while getting the value </param>
         public sealed record Error(Exception Exception) : Failed;
     }
-
 }
