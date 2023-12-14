@@ -29,7 +29,7 @@ public class TaskQueue<TKey, TValue> where TKey : IComparable<TKey> {
 
     public TaskQueue(TaskHandler task, int maxTaskDuration)
             : this(task, maxTaskDuration, []) { }
-    public TaskQueue(TaskHandler task, int maxTaskDuration, Comparer<TKey> comparer)
+    public TaskQueue(TaskHandler task, int maxTaskDuration, IComparer<TKey> comparer)
             : this(
                 task,
                 maxTaskDuration,
