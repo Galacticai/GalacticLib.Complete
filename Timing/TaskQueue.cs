@@ -43,13 +43,14 @@ public class TaskQueue<TKey, TValue> where TKey : IComparable<TKey> {
     /// or <see langword="null"/> if <paramref name="key"/> doesn't exist
     /// </returns>
     /// <exception cref="KeyNotFoundException" />
-    public FutureValue<TValue>? this[TKey key] {
-        get => Queue.TryGetValue(key, out var value)
+    public FutureValue<TValue>? this[TKey key]
+        => Queue.TryGetValue(key, out var value)
             ? value
             : null;
-        private set => Queue[key]
-            = value
-            ?? throw new KeyNotFoundException($"Key not found: {key}");
+    private void Set(TKey key, FutureValue<TValue> value) {
+        if (!ContainsKey(key))
+            throw new KeyNotFoundException($"Key not found: {key}");
+        Queue[key] = value;
     }
 
     public TaskHandler Task { get; }
@@ -78,7 +79,7 @@ public class TaskQueue<TKey, TValue> where TKey : IComparable<TKey> {
     /// <returns> true if added </returns>
     public bool AddWithoutRun(TKey key, bool force = false) {
         if (!force && ContainsKey(key)) return false;
-        this[key] = new FutureValue<TValue>.Pending();
+        Set(key, new FutureValue<TValue>.Pending());
         TaskAdded?.Invoke(key);
         return true;
     }
@@ -116,11 +117,13 @@ public class TaskQueue<TKey, TValue> where TKey : IComparable<TKey> {
             lock (RunningTasks)
                 RunningTasks.Add(key, (cancelToken, task));
 
-            this[key] = new FutureValue<TValue>.Running();
+            var startedAt = DateTime.Now;
+            Set(key, new FutureValue<TValue>.Running(startedAt));
             task.Start();
             TaskStarted?.Invoke(key);
             value = await task;
-            this[key] = new FutureValue<TValue>.Finished(value);
+            var runTimeSpan = DateTime.Now - startedAt;
+            Set(key, new FutureValue<TValue>.Finished(value, startedAt, runTimeSpan));
             TaskDone?.Invoke(key, value);
 
             lock (RunningTasks)
@@ -129,10 +132,10 @@ public class TaskQueue<TKey, TValue> where TKey : IComparable<TKey> {
                 Remove(key, forceStop: false);
 
         } catch (OperationCanceledException) {
-            this[key] = new FutureValue<TValue>.Failed.TimedOut(MaxTaskDuration);
+            Set(key, new FutureValue<TValue>.Failed.TimedOut(MaxTaskDuration));
 
         } catch (Exception exception) {
-            this[key] = new FutureValue<TValue>.Failed.Error(exception);
+            Set(key, new FutureValue<TValue>.Failed.Error(exception));
         }
 
         TValue? current
