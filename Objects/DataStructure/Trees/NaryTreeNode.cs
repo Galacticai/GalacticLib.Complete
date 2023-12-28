@@ -102,40 +102,40 @@ public class NaryTreeNode<TValue>(
     /// <summary> Remove a the given <paramref name="childTree"/> </summary>
     /// <returns> true if the <paramref name="childTree"/> was found, then removed </returns>
     public bool Remove(NaryTreeNode<TValue> childTree) => Children.Values.Remove(childTree);
-    /// <summary> Remove the given <paramref name="sequence"/> only if it exists </summary> 
-    /// <returns> true if the whole <paramref name="sequence"/> was found, then removed </returns>
-    public bool Remove([MinLength(1)] params TValue[] sequence) {
-        if (sequence is null || sequence.Length == 0)
-            throw new ArgumentOutOfRangeException(nameof(sequence));
+    // /// <summary> Remove the given <paramref name="sequence"/> only if it exists </summary> 
+    // /// <returns> true if the whole <paramref name="sequence"/> was found, then removed </returns>
+    // public bool Remove([MinLength(1)] params TValue[] sequence) {
+    //     if (sequence is null || sequence.Length == 0)
+    //         throw new ArgumentOutOfRangeException(nameof(sequence));
 
-        NaryTreeNode<TValue> node = this;
-        Stack<NaryTreeNode<TValue>> stack = new();
+    //     NaryTreeNode<TValue> node = this;
+    //     Stack<NaryTreeNode<TValue>> stack = new();
 
-        foreach (TValue value in sequence) {
-            NaryTreeNode<TValue>? nodeChild = node.TryGetChild(value);
-            if (nodeChild is null) return false;
-            stack.Push(node);
-            node = nodeChild;
-        }
-        if (stack.Count == 0) return false;
-        var last = stack.Peek();
-        //! important: the last node must be a sequence end
-        if (!last.IsSequenceEnd) return false;
+    //     foreach (TValue value in sequence) {
+    //         NaryTreeNode<TValue>? nodeChild = node.TryGetChild(value);
+    //         if (nodeChild is null) return false;
+    //         stack.Push(node);
+    //         node = nodeChild;
+    //     }
+    //     if (stack.Count == 0) return false;
+    //     var last = stack.Peek();
+    //     //! important: the last node must be a sequence end
+    //     if (!last.IsSequenceEnd) return false;
 
-        // Remove each child in the stack
-        while (stack.Count > 0) {
-            NaryTreeNode<TValue> targetNode = stack.Pop();
-            TValue target = sequence[stack.Count - 1];
-            bool removed = targetNode.Remove(target);
-            if (!removed) return false;
-        }
+    //     // Remove each child in the stack
+    //     while (stack.Count > 0) {
+    //         NaryTreeNode<TValue> targetNode = stack.Pop();
+    //         TValue target = sequence[stack.Count - 1];
+    //         bool removed = targetNode.Remove(target);
+    //         if (!removed) return false;
+    //     }
 
-        return true;
-    }
-    /// <summary> Remove the given <paramref name="sequence"/> only if it exists </summary> 
-    /// <returns> true if the whole <paramref name="sequence"/> was found, then removed </returns>
-    public bool Remove(IEnumerable<TValue> sequence)
-        => Remove(sequence.ToArray());
+    //     return true;
+    // }
+    // /// <summary> Remove the given <paramref name="sequence"/> only if it exists </summary> 
+    // /// <returns> true if the whole <paramref name="sequence"/> was found, then removed </returns>
+    // public bool Remove(IEnumerable<TValue> sequence)
+    //     => Remove(sequence.ToArray());
 
 
     /// <summary> Clear children (<see cref="NaryTreeNode{TValue}"/>s under this node) </summary>
@@ -176,11 +176,11 @@ public class NaryTreeNode<TValue>(
         tree.Remove(childTree);
         return tree;
     }
-    /// <summary> Calls <see cref="Remove(IEnumerable{TValue})"/> </summary> 
-    public static NaryTreeNode<TValue> operator -(NaryTreeNode<TValue> tree, IEnumerable<TValue> sequence) {
-        tree.Remove(sequence);
-        return tree;
-    }
+    // /// <summary> Calls <see cref="Remove(IEnumerable{TValue})"/> </summary> 
+    // public static NaryTreeNode<TValue> operator -(NaryTreeNode<TValue> tree, IEnumerable<TValue> sequence) {
+    //     tree.Remove(sequence);
+    //     return tree;
+    // }
 
     /// <summary> Get the value of a given <paramref name="tree"/> 
     /// <para> ⚠️ Data loss warning: you will get <see cref="Value"/> and lose the <paramref name="tree"/> along with its branches! </para>
