@@ -6,13 +6,13 @@ namespace GalacticLib.Objects.DataStructure.Trees;
 public class NaryTreeNode<TValue>(
         TValue value,
         bool isSequenceEnd = false,
-        IDictionary<TValue, NaryTreeNode<TValue>>? children = null
+        Dictionary<TValue, NaryTreeNode<TValue>>? children = null
 
 ) where TValue : notnull {
 
     public TValue Value { get; set; } = value;
-    public IDictionary<TValue, NaryTreeNode<TValue>> Children { get; set; }
-        = children ?? new Dictionary<TValue, NaryTreeNode<TValue>>();
+    public Dictionary<TValue, NaryTreeNode<TValue>> Children { get; set; }
+        = children ?? [];
 
     /// <summary> End of sequence (could have children that are for other sequences) 
     /// <br/> Example: ABC ... ABCDEF </summary>
@@ -76,61 +76,56 @@ public class NaryTreeNode<TValue>(
     /// <br/> ⚠️ The <paramref name="sequence"/> starts from the children, not from this node </summary>
     /// <param name="sequence"> Sequence of <typeparamref name="TValue"/> </param>
     /// <returns> true if the <paramref name="sequence"/> was found </returns>
-    public bool Contains([MinLength(1)] params TValue[] sequence) {
-        if (sequence is null || sequence.Length == 0)
-            throw new ArgumentOutOfRangeException(nameof(sequence));
+    public bool Contains([MinLength(1)] params TValue[] sequence)
+        => Contains(sequence, out var _);
 
-        NaryTreeNode<TValue> node = this;
-        foreach (TValue value in sequence) {
-            NaryTreeNode<TValue>? childNode = node.TryGetChild(value);
-            if (childNode is null) return false;
-            node = childNode;
-        }
-        return node.IsSequenceEnd;
-    }
     /// <summary> Checks if a <paramref name="sequence"/> exists under this node (Goes deeper in the tree equal to the sequence length) 
     /// <br/> ⚠️ The <paramref name="sequence"/> starts from the children, not from this node </summary>
     /// <param name="sequence"> Sequence of <typeparamref name="TValue"/> </param>
     /// <returns> true if the <paramref name="sequence"/> was found </returns>
-    public bool Contains([MinLength(1)] IEnumerable<TValue> sequence)
-        => Contains(sequence.ToArray());
+    public bool Contains(
+            [MinLength(1)] IEnumerable<TValue> sequence,
+            [MaybeNullWhen(false)] out List<NaryTreeNode<TValue>>? nodes
+    ) {
+        ArgumentNullException.ThrowIfNull(nameof(sequence));
 
+        nodes = [];
+        NaryTreeNode<TValue> node = this;
+        foreach (TValue value in sequence) {
+            NaryTreeNode<TValue>? childNode = node.TryGetChild(value);
+            if (childNode is null) {
+                nodes = null;
+                return false;
+            }
+            nodes.Add(childNode);
+            node = childNode;
+        }
+        if (nodes.Count > 0 && node.IsSequenceEnd)
+            return true;
+        else {
+            nodes = null;
+            return false;
+        }
+    }
 
     /// <summary> Remove a child that has the given <paramref name="value"/> </summary>
     /// <returns> true if <paramref name="value"/> was found and removed </returns>
     public bool Remove(TValue value) => Children.Remove(value);
     /// <summary> Remove a the given <paramref name="childTree"/> </summary>
     /// <returns> true if the <paramref name="childTree"/> was found, then removed </returns>
-    public bool Remove(NaryTreeNode<TValue> childTree) => Children.Values.Remove(childTree);
+    public bool Remove(NaryTreeNode<TValue> childTree) => Children.Remove(childTree.Value);
     /// <summary> Remove the given <paramref name="sequence"/> only if it exists </summary> 
     /// <returns> true if the whole <paramref name="sequence"/> was found, then removed </returns>
     public bool Remove([MinLength(1)] params TValue[] sequence) {
-        throw new NotImplementedException("This is currently broken, it will be fixed soon");
+        bool found = Contains(sequence, out List<NaryTreeNode<TValue>>? nodes);
+        if (!found) return false;
 
-        if (sequence is null || sequence.Length == 0)
-            throw new ArgumentOutOfRangeException(nameof(sequence));
-
-        NaryTreeNode<TValue> node = this;
-        Stack<NaryTreeNode<TValue>> stack = new();
-
-        foreach (TValue value in sequence) {
-            NaryTreeNode<TValue>? nodeChild = node.TryGetChild(value);
-            if (nodeChild is null) return false;
-            stack.Push(node);
-            node = nodeChild;
+        for (int i = nodes!.Count - 1; i > 0; i--) {
+            var parent = nodes[i - 1];
+            var child = nodes[i];
+            parent.Remove(child);
         }
-        if (stack.Count == 0) return false;
-        var last = stack.Peek();
-        //! important: the last node must be a sequence end
-        if (!last.IsSequenceEnd) return false;
-
-        // Remove each child in the stack
-        while (stack.Count > 0) {
-            NaryTreeNode<TValue> targetNode = stack.Pop();
-            TValue target = sequence[stack.Count - 1];
-            bool removed = targetNode.Remove(target);
-            if (!removed) return false;
-        }
+        Remove(nodes[0]);
 
         return true;
     }
@@ -144,8 +139,10 @@ public class NaryTreeNode<TValue>(
     public void ClearChildren() => Children.Clear();
 
 
-    /// <summary> Calls <see cref="Contains(IEnumerable{TValue})"/> </summary> 
-    public bool this[IEnumerable<TValue> sequence] => Contains(sequence);
+    /// <summary> Calls <see cref="Contains(TValue[])"/> (converts <paramref name="sequence"/> to array) </summary> 
+    public bool this[IEnumerable<TValue> sequence] => Contains(sequence.ToArray());
+    /// <summary> Calls <see cref="Contains(TValue[])"/> </summary>  
+    public bool this[params TValue[] sequence] => Contains(sequence);
     /// <summary> Calls <see cref="Contains(NaryTreeNode{TValue})"/> </summary> 
     public bool this[NaryTreeNode<TValue> tree] => Contains(tree);
     /// <summary> Calls <see cref="TryGetChild(TValue)"/> </summary>
