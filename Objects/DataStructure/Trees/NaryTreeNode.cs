@@ -15,15 +15,10 @@ where TValue : notnull {
     public IDictionary<TValue, INaryTreeNode<TValue>> Children { get; set; }
         = children ?? [];
 
-    /// <summary> End of sequence (could have children that are for other sequences) 
-    /// <br/> Example: ABC ... ABCDEF </summary>
     public bool IsSequenceEnd { get; set; } = isSequenceEnd;
 
-    /// <summary> End of tree (no children) </summary>
     public bool IsEnd => Children.Count == 0;
 
-    /// <summary> Add a child tree </summary>
-    /// <returns> true if added </returns>
     public bool Add(INaryTreeNode<TValue> childTree, bool force = false) {
         if (force) {
             Children[childTree.Value] = childTree;
@@ -31,12 +26,8 @@ where TValue : notnull {
         }
         return Children.TryAdd(childTree.Value, childTree);
     }
-    /// <summary> Add a new tree with the given <paramref name="value"/> </summary> 
-    /// <returns> true if it did not exist and was added </returns>
     public bool Add(TValue value)
         => Add(new NaryTreeNode<TValue>(value), false);
-    /// <summary> Add a given <paramref name="sequence"/> </summary> 
-    /// <returns> true if the tree changed </returns>
     public bool Add([MinLength(1)] IEnumerable<TValue> sequence) {
         ArgumentNullException.ThrowIfNull(sequence);
 
@@ -61,19 +52,9 @@ where TValue : notnull {
     }
 
 
-    /// <summary> Check if a direct child has the given <paramref name="value"/> (Only checks 1 level of children) </summary>
-    /// <returns> true if <paramref name="value"/> was found </returns>
     public bool Contains(TValue value) => Children.ContainsKey(value);
-    /// <summary> Check if this node has the given <paramref name="childTree"/> (Only checks 1 level of children) </summary>
-    /// <returns> true if <paramref name="childTree"/> was found </returns>
     public bool Contains(INaryTreeNode<TValue> childTree)
         => Children.Contains(new(childTree.Value, childTree));
-
-    /// <summary> Checks if a <paramref name="sequence"/> exists under this node (Goes deeper in the tree equal to the sequence length) 
-    /// <br/> ⚠️ The <paramref name="sequence"/> starts from the children, not from this node </summary>
-    /// <param name="sequence"> Sequence of <typeparamref name="TValue"/> </param>
-    /// <param name="nodes"> List of nodes if they were found, otherwise null </param>
-    /// <returns> true if the <paramref name="sequence"/> was found </returns>
     public bool Contains(
             [MinLength(1)]
                 IEnumerable<TValue> sequence,
@@ -99,14 +80,8 @@ where TValue : notnull {
         return false;
     }
 
-    /// <summary> Remove a child that has the given <paramref name="value"/> </summary>
-    /// <returns> true if <paramref name="value"/> was found and removed </returns>
     public bool Remove(TValue value) => Children.Remove(value);
-    /// <summary> Remove a the given <paramref name="childTree"/> </summary>
-    /// <returns> true if the <paramref name="childTree"/> was found, then removed </returns>
     public bool Remove(INaryTreeNode<TValue> childTree) => Children.Remove(childTree.Value);
-    /// <summary> Remove the given <paramref name="sequence"/> only if it exists </summary> 
-    /// <returns> true if the whole <paramref name="sequence"/> was found, then removed </returns>
     public bool Remove([MinLength(1)] IEnumerable<TValue> sequence) {
         ArgumentNullException.ThrowIfNull(sequence);
 
@@ -123,15 +98,11 @@ where TValue : notnull {
         return true;
     }
 
-    /// <summary> Clear children (<see cref="NaryTreeNode{TValue}"/>s under this node) </summary>
     public void ClearChildren() => Children.Clear();
 
 
-    /// <summary> Calls <see cref="Contains(TValue[], List{NaryTreeNode{TValue}})"/> (and discards the list of nodes that were found) </summary> 
     public bool this[IEnumerable<TValue> sequence] => Contains(sequence, out _);
-    /// <summary> Calls <see cref="Contains(NaryTreeNode{TValue})"/> </summary> 
     public bool this[INaryTreeNode<TValue> tree] => Contains(tree);
-    /// <summary> Calls <see cref="TryGetChild(TValue)"/> </summary>
     public INaryTreeNode<TValue>? this[TValue value] => TryGetChild(value);
 
 
@@ -140,7 +111,7 @@ where TValue : notnull {
         tree.Add(value);
         return tree;
     }
-    /// <summary> Calls <see cref="Add(NaryTreeNode{TValue}, bool)"/> </summary> 
+    /// <summary> Calls <see cref="Add(INaryTreeNode{TValue}, bool)"/> </summary> 
     public static NaryTreeNode<TValue> operator +(NaryTreeNode<TValue> tree, NaryTreeNode<TValue> childTree) {
         tree.Add(childTree);
         return tree;
@@ -156,7 +127,7 @@ where TValue : notnull {
         tree.Remove(value);
         return tree;
     }
-    /// <summary> Calls <see cref="Remove(NaryTreeNode{TValue})"/> </summary> 
+    /// <summary> Calls <see cref="Remove(INaryTreeNode{TValue})"/> </summary> 
     public static NaryTreeNode<TValue> operator -(NaryTreeNode<TValue> tree, NaryTreeNode<TValue> childTree) {
         tree.Remove(childTree);
         return tree;
