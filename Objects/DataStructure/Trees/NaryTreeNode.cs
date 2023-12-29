@@ -84,28 +84,28 @@ public class NaryTreeNode<TValue>(
     /// <param name="sequence"> Sequence of <typeparamref name="TValue"/> </param>
     /// <returns> true if the <paramref name="sequence"/> was found </returns>
     public bool Contains(
-            [MinLength(1)] IEnumerable<TValue> sequence,
-            [MaybeNullWhen(false)] out List<NaryTreeNode<TValue>>? nodes
+            [MinLength(1)]
+                IEnumerable<TValue> sequence,
+            [MaybeNullWhen(false)]
+                out List<NaryTreeNode<TValue>>? nodes
     ) {
         ArgumentNullException.ThrowIfNull(nameof(sequence));
 
         nodes = [];
         NaryTreeNode<TValue> node = this;
+
         foreach (TValue value in sequence) {
             NaryTreeNode<TValue>? childNode = node.TryGetChild(value);
-            if (childNode is null) {
-                nodes = null;
-                return false;
-            }
+            if (childNode is null) goto Fail;
             nodes.Add(childNode);
             node = childNode;
         }
         if (nodes.Count > 0 && node.IsSequenceEnd)
             return true;
-        else {
-            nodes = null;
-            return false;
-        }
+
+        Fail:
+        nodes = null;
+        return false;
     }
 
     /// <summary> Remove a child that has the given <paramref name="value"/> </summary>
