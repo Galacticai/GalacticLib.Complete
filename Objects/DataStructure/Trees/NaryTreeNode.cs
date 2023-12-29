@@ -36,9 +36,8 @@ public class NaryTreeNode<TValue>(
         => Add(new NaryTreeNode<TValue>(value), false);
     /// <summary> Add a given <paramref name="sequence"/> </summary> 
     /// <returns> true if the tree changed </returns>
-    public bool Add([MinLength(1)] params TValue[] sequence) {
-        if (sequence is null || sequence.Length == 0)
-            throw new ArgumentOutOfRangeException(nameof(sequence));
+    public bool Add([MinLength(1)] IEnumerable<TValue> sequence) {
+        ArgumentNullException.ThrowIfNull(sequence);
 
         NaryTreeNode<TValue> currentNode = this;
         bool changed = false;
@@ -51,10 +50,6 @@ public class NaryTreeNode<TValue>(
         currentNode.IsSequenceEnd = true;
         return changed;
     }
-    /// <summary> Add a given <paramref name="sequence"/> </summary> 
-    /// <returns> true if the tree changed </returns>
-    public bool Add([MinLength(1)] IEnumerable<TValue> sequence)
-        => Add(sequence.ToArray());
 
 
     public bool TryGetValue(TValue value, [MaybeNullWhen(false)] out NaryTreeNode<TValue>? node)
@@ -72,16 +67,11 @@ public class NaryTreeNode<TValue>(
     /// <returns> true if <paramref name="childTree"/> was found </returns>
     public bool Contains(NaryTreeNode<TValue> childTree)
         => Children.Contains(new(childTree.Value, childTree));
-    /// <summary> Checks if a <paramref name="sequence"/> exists under this node (Goes deeper in the tree equal to the sequence length) 
-    /// <br/> ⚠️ The <paramref name="sequence"/> starts from the children, not from this node </summary>
-    /// <param name="sequence"> Sequence of <typeparamref name="TValue"/> </param>
-    /// <returns> true if the <paramref name="sequence"/> was found </returns>
-    public bool Contains([MinLength(1)] params TValue[] sequence)
-        => Contains(sequence, out var _);
 
     /// <summary> Checks if a <paramref name="sequence"/> exists under this node (Goes deeper in the tree equal to the sequence length) 
     /// <br/> ⚠️ The <paramref name="sequence"/> starts from the children, not from this node </summary>
     /// <param name="sequence"> Sequence of <typeparamref name="TValue"/> </param>
+    /// <param name="nodes"> List of nodes if they were found, otherwise null </param>
     /// <returns> true if the <paramref name="sequence"/> was found </returns>
     public bool Contains(
             [MinLength(1)]
@@ -116,7 +106,9 @@ public class NaryTreeNode<TValue>(
     public bool Remove(NaryTreeNode<TValue> childTree) => Children.Remove(childTree.Value);
     /// <summary> Remove the given <paramref name="sequence"/> only if it exists </summary> 
     /// <returns> true if the whole <paramref name="sequence"/> was found, then removed </returns>
-    public bool Remove([MinLength(1)] params TValue[] sequence) {
+    public bool Remove([MinLength(1)] IEnumerable<TValue> sequence) {
+        ArgumentNullException.ThrowIfNull(sequence);
+
         bool found = Contains(sequence, out List<NaryTreeNode<TValue>>? nodes);
         if (!found) return false;
 
@@ -129,20 +121,13 @@ public class NaryTreeNode<TValue>(
 
         return true;
     }
-    /// <summary> Remove the given <paramref name="sequence"/> only if it exists </summary> 
-    /// <returns> true if the whole <paramref name="sequence"/> was found, then removed </returns>
-    public bool Remove(IEnumerable<TValue> sequence)
-        => Remove(sequence.ToArray());
-
 
     /// <summary> Clear children (<see cref="NaryTreeNode{TValue}"/>s under this node) </summary>
     public void ClearChildren() => Children.Clear();
 
 
-    /// <summary> Calls <see cref="Contains(TValue[])"/> (converts <paramref name="sequence"/> to array) </summary> 
-    public bool this[IEnumerable<TValue> sequence] => Contains(sequence.ToArray());
-    /// <summary> Calls <see cref="Contains(TValue[])"/> </summary>  
-    public bool this[params TValue[] sequence] => Contains(sequence);
+    /// <summary> Calls <see cref="Contains(TValue[], List{NaryTreeNode{TValue}})"/> (and discards the list of nodes that were found) </summary> 
+    public bool this[IEnumerable<TValue> sequence] => Contains(sequence, out _);
     /// <summary> Calls <see cref="Contains(NaryTreeNode{TValue})"/> </summary> 
     public bool this[NaryTreeNode<TValue> tree] => Contains(tree);
     /// <summary> Calls <see cref="TryGetChild(TValue)"/> </summary>
