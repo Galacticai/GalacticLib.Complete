@@ -1,3 +1,4 @@
+using System.Collections;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 
@@ -8,7 +9,7 @@ public class NaryTreeNode<TValue>(
         bool isSequenceEnd = false,
         Dictionary<TValue, INaryTreeNode<TValue>>? children = null
 
-) : INaryTreeNode<TValue>
+) : INaryTreeNode<TValue>, IEnumerable<TValue>
 where TValue : notnull {
 
     public TValue Value { get; set; } = value;
@@ -99,6 +100,18 @@ where TValue : notnull {
     }
 
     public void ClearChildren() => Children.Clear();
+
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    public IEnumerator<TValue> GetEnumerator()
+        => Traverse(this).GetEnumerator();
+
+    public static IEnumerable<TValue> Traverse(INaryTreeNode<TValue>? node) {
+        if (node is null) yield break;
+        yield return node.Value;
+        foreach (var child in node.Children.Values)
+            foreach (var value in Traverse(child))
+                yield return value;
+    }
 
 
     public bool this[IEnumerable<TValue> sequence] => Contains(sequence, out _);

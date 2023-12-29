@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace GalacticLib.Objects.DataStructure.Trees;
 
-public interface INaryTreeNode<TValue> where TValue : notnull {
+public interface INaryTreeNode<TValue> : IEnumerable<TValue> where TValue : notnull {
 
     public TValue Value { get; set; }
     public IDictionary<TValue, INaryTreeNode<TValue>> Children { get; set; }
