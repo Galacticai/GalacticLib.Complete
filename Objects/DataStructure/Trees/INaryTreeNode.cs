@@ -64,7 +64,8 @@ public interface INaryTreeNode<TValue> where TValue : notnull {
     public void ClearChildren();
 
 
-    /// <summary> Calls <see cref="Contains(TValue[], List{INaryTreeNode{TValue}})"/> (and discards the list of nodes that were found) </summary> 
+    /// <summary> Calls <see cref="Contains(IEnumerable{TValue}, out List{INaryTreeNode{TValue}})"/>
+    /// <br/> (and discards the list of nodes that were found) </summary> 
     public bool this[IEnumerable<TValue> sequence] { get; }
     /// <summary> Calls <see cref="Contains(INaryTreeNode{TValue})"/> </summary> 
     public bool this[INaryTreeNode<TValue> tree] { get; }
