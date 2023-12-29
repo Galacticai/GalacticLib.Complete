@@ -1,6 +1,7 @@
 using System.Collections;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
+using Aspose.Svg.Dom;
 
 namespace GalacticLib.Objects.DataStructure.Trees;
 
@@ -32,15 +33,19 @@ where TValue : notnull {
     public bool Add([MinLength(1)] IEnumerable<TValue> sequence) {
         ArgumentNullException.ThrowIfNull(sequence);
 
-        NaryTreeNode<TValue> currentNode = this;
+        INaryTreeNode<TValue> node = this;
         bool changed = false;
         foreach (TValue value in sequence) {
+            if (node.Contains(value)) {
+                node = node.TryGetChild(value)!;
+                continue;
+            }
             NaryTreeNode<TValue> childNode = new(value);
-            bool added = currentNode.Add(childNode);
+            bool added = node.Add(childNode);
             changed = changed || added;
-            currentNode = childNode;
+            node = childNode;
         }
-        currentNode.IsSequenceEnd = true;
+        node.IsSequenceEnd = true;
         return changed;
     }
 
