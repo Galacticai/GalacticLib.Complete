@@ -1,6 +1,12 @@
 # GalacticLib
 
-## Objects.DataStructures.Trees
+<a href="https://github.com/Galacticai/GalacticLib.Complete/tree/master/Objects/DataStructure/Trees">
+    <img height=24 src="https://img.shields.io/badge/Namespace%20Overview-Trees-white?color=informational&style=flat-square" />
+</a>
+
+`GalacticLib`>`Objects`>`DataStructures`>**(`Trees`)**
+
+---
 
 ```mermaid
 classDiagram
