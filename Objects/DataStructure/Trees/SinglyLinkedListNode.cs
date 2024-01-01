@@ -8,8 +8,8 @@ public class SinglyLinkedListNode<TValue>(
 
 ) : IEnumerable<TValue> {
 
-    public TValue Value = value;
-    public SinglyLinkedListNode<TValue>? Next = next;
+    public TValue Value { get; set; } = value;
+    public SinglyLinkedListNode<TValue>? Next { get; set; } = next;
 
     public override string ToString()
         => $"[{string.Join(',', this)}]";
