@@ -1,9 +1,16 @@
+using System.Collections;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Nodes;
 
 namespace GalacticLib.Objects.DataStructure.Trees;
 
-public interface INaryTreeNode<TValue> : IEnumerable<TValue> where TValue : notnull {
+public interface INaryTreeNode<TValue>
+        : IEnumerable<INaryTreeNode<TValue>>, IJsonable
+        where TValue : notnull {
+
+    /// <summary> Very important to generate the correct child type that will be added into the tree </summary>
+    protected INaryTreeNode<TValue> Create(TValue value);
 
     public TValue Value { get; set; }
     public IDictionary<TValue, INaryTreeNode<TValue>> Children { get; set; }
@@ -71,4 +78,100 @@ public interface INaryTreeNode<TValue> : IEnumerable<TValue> where TValue : notn
     public bool this[INaryTreeNode<TValue> tree] { get; }
     /// <summary> Calls <see cref="TryGetChild(TValue)"/> </summary>
     public INaryTreeNode<TValue>? this[TValue value] { get; }
+
+
+    /// <summary> Convert the whole tree to <see cref="JsonObject"/> recursively 
+    /// <br/> ⚠️ Cyclic references will cause <see cref="IJsonable.CyclicReferenceException"/> </summary>
+    /// <exception cref="IJsonable.CyclicReferenceException" />
+    /// <returns> This entire tree as a <see cref="JsonObject"/> </returns>
+    public JsonObject ToJsonTree();
+
+    // public  JsonValue ToJson();
+
+    // public  IEnumerator<INaryTreeNode<TValue>> GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }
+/*
+classDiagram
+    class IEnumerable {
+        > T
+        +GetEnumerator() : IEnumerable
+        +GetEnumerator() : : IEnumerable(T)
+    }
+    notnull <|-- "is" TValue
+    INumber <|-- "inherits" TNumber
+    IJsonableObject <|-- "inherits" TObject
+    
+    class CyclicReferenceException {
+        +CyclicReferenceException(message: string?, innerException: Exception?)
+    }
+    class IJsonable {
+        +ToJson(): JsonNode
+    } 
+    class IJsonableObject {
+        >T : IJsonableObject
+        +FromJson(json: JsonNode): T
+    }
+    TValue <|-- "inherits" TNumber
+    TValue <|-- "inherits" TObject
+    
+    IJsonable <|-- "inherits" IJsonableObject
+    IJsonable --> CyclicReferenceException
+
+    IEnumerable <|-- "inherits" INaryTreeNode
+    IJsonable <|-- "inherits" INaryTreeNode
+    class INaryTreeNode {
+        >TValue : notnull
+
+        -Create(TValue)
+
+        +Value: TValue: get set
+        +Children : : Dictionary(TValue, INaryTreeNode): get set
+        +IsSequenceEnd: bool: get set
+        +IsEnd: bool: get
+
+        +Add(INaryTreeNode(TValue), bool): bool
+        +Add(TValue): bool
+        +Add(IEnumerable(TValue)): bool
+
+        +TryGetValue(TValue, out INaryTreeNode(TValue) ?): bool
+        +TryGetChild(TValue): INaryTreeNode(TValue)
+
+        +Contains(TValue): bool
+        +Contains(INaryTreeNode(TValue)): bool
+        +Contains(IEnumerable(TValue), out List(INaryTreeNode(TValue))?): bool
+    
+        +Remove(INaryTreeNode(TValue), bool): bool
+        +Remove(TValue): bool
+        +Remove(IEnumerable `TValue): bool
+
+        +ClearChildren()
+
+        +this(IEnumerable(TValue)) : bool: get
+        +this(INaryTreeNode(TValue)) : bool: get
+        +this(TValue) : : INaryTreeNode(TValue): get
+
+        +ToJsonTree(): JsonObject
+    }
+    INaryTreeNode <|-- "inherits" NaryTreeNode
+    class NaryTreeNode {
+        +Traverse : : IEnumerable(INaryTreeNode(TValue))
+        +op_Addition(NaryTreeNode(TValue), TValue) : : NaryTreeNode(TValue)
+        +op_Addition(NaryTreeNode(TValue), NaryTreeNode(TValue)) : : NaryTreeNode(TValue)
+        +op_Addition(NaryTreeNode(TValue), IEnumerable(TValue)) : : NaryTreeNode(TValue)
+        +op_Subtraction(NaryTreeNode(TValue), TValue) : : NaryTreeNode(TValue)
+        +op_Subtraction(NaryTreeNode(TValue), NaryTreeNode(TValue)) : : NaryTreeNode(TValue)
+        +op_Subtraction(NaryTreeNode(TValue), IEnumerable(TValue)) : : NaryTreeNode(TValue)
+        +op_Explicit(NaryTreeNode(TValue)): TValue
+    }
+    NaryTreeNode <|-- "inherits" NumberNaryTreeNode
+    IJsonableObject <|-- "inherits" NumberNaryTreeNode
+    class ObjectNaryTreeNode {
+        >TObject: IJsonableObject
+    }
+    NaryTreeNode <|-- "inherits" ObjectNaryTreeNode
+    IJsonableObject <|-- "inherits" ObjectNaryTreeNode
+    class NumberNaryTreeNode {
+        >TNumber: INumber
+    }
+*/

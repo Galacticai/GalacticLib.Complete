@@ -1,36 +1,44 @@
-using System.Collections;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
-using Aspose.Svg.Dom;
+using System.Text.Json.Nodes;
 
 namespace GalacticLib.Objects.DataStructure.Trees;
 
-public class NaryTreeNode<TValue>(
+/// <summary> Data structure representing n-ary tree node </summary>
+/// <typeparam name="TValue"> Type of <see cref="Value"/> </typeparam>
+/// <param name="value"> This node value </param>
+/// <param name="isSequenceEnd"> This node is the end of a sequence </param>
+/// <param name="children"> This node children </param>
+public abstract class NaryTreeNode<TValue>(
         TValue value,
         bool isSequenceEnd = false,
         Dictionary<TValue, INaryTreeNode<TValue>>? children = null
 
-) : INaryTreeNode<TValue>, IEnumerable<TValue>
+) : INaryTreeNode<TValue>
 where TValue : notnull {
 
-    public TValue Value { get; set; } = value;
-    public IDictionary<TValue, INaryTreeNode<TValue>> Children { get; set; }
+    public virtual TValue Value { get; set; } = value;
+    public virtual IDictionary<TValue, INaryTreeNode<TValue>> Children { get; set; }
         = children ?? [];
 
-    public bool IsSequenceEnd { get; set; } = isSequenceEnd;
+    public virtual bool IsSequenceEnd { get; set; } = isSequenceEnd;
 
-    public bool IsEnd => Children.Count == 0;
+    public virtual bool IsEnd => Children.Count == 0;
 
-    public bool Add(INaryTreeNode<TValue> childTree, bool force = false) {
+
+    public virtual INaryTreeNode<TValue> Create(TValue value)
+        => Create(value);
+
+    public virtual bool Add(INaryTreeNode<TValue> childTree, bool force = false) {
         if (force) {
             Children[childTree.Value] = childTree;
             return true;
         }
         return Children.TryAdd(childTree.Value, childTree);
     }
-    public bool Add(TValue value)
-        => Add(new NaryTreeNode<TValue>(value), false);
-    public bool Add([MinLength(1)] IEnumerable<TValue> sequence) {
+    public virtual bool Add(TValue value)
+        => Add(Create(value), false);
+    public virtual bool Add([MinLength(1)] IEnumerable<TValue> sequence) {
         ArgumentNullException.ThrowIfNull(sequence);
 
         INaryTreeNode<TValue> node = this;
@@ -40,7 +48,7 @@ where TValue : notnull {
                 node = node.TryGetChild(value)!;
                 continue;
             }
-            NaryTreeNode<TValue> childNode = new(value);
+            NaryTreeNode<TValue> childNode = (NaryTreeNode<TValue>)Create(value);
             bool added = node.Add(childNode);
             changed = changed || added;
             node = childNode;
@@ -50,18 +58,18 @@ where TValue : notnull {
     }
 
 
-    public bool TryGetValue(TValue value, [MaybeNullWhen(false)] out INaryTreeNode<TValue>? node)
+    public virtual bool TryGetValue(TValue value, [MaybeNullWhen(false)] out INaryTreeNode<TValue>? node)
         => Children.TryGetValue(value, out node);
-    public INaryTreeNode<TValue>? TryGetChild(TValue value) {
+    public virtual INaryTreeNode<TValue>? TryGetChild(TValue value) {
         _ = TryGetValue(value, out INaryTreeNode<TValue>? node);
         return node;
     }
 
 
-    public bool Contains(TValue value) => Children.ContainsKey(value);
-    public bool Contains(INaryTreeNode<TValue> childTree)
-        => Children.Contains(new(childTree.Value, childTree));
-    public bool Contains(
+    public virtual bool Contains(TValue value) => Children.ContainsKey(value);
+    public virtual bool Contains(INaryTreeNode<TValue> childTree)
+        => Children.Values.Contains(childTree);
+    public virtual bool Contains(
             [MinLength(1)]
                 IEnumerable<TValue> sequence,
             [MaybeNullWhen(false)]
@@ -86,9 +94,9 @@ where TValue : notnull {
         return false;
     }
 
-    public bool Remove(TValue value) => Children.Remove(value);
-    public bool Remove(INaryTreeNode<TValue> childTree) => Children.Remove(childTree.Value);
-    public bool Remove([MinLength(1)] IEnumerable<TValue> sequence) {
+    public virtual bool Remove(TValue value) => Children.Remove(value);
+    public virtual bool Remove(INaryTreeNode<TValue> childTree) => Children.Remove(childTree.Value);
+    public virtual bool Remove([MinLength(1)] IEnumerable<TValue> sequence) {
         ArgumentNullException.ThrowIfNull(sequence);
 
         bool found = Contains(sequence, out List<INaryTreeNode<TValue>>? nodes);
@@ -104,24 +112,54 @@ where TValue : notnull {
         return true;
     }
 
-    public void ClearChildren() => Children.Clear();
+    public virtual void ClearChildren() => Children.Clear();
 
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-    public IEnumerator<TValue> GetEnumerator()
-        => Traverse(this).GetEnumerator();
 
-    public static IEnumerable<TValue> Traverse(INaryTreeNode<TValue>? node) {
-        if (node is null) yield break;
-        yield return node.Value;
-        foreach (var child in node.Children.Values)
-            foreach (var value in Traverse(child))
-                yield return value;
+    public abstract JsonNode ToJson();
+    public virtual JsonObject ToJsonTree() {
+        HashSet<INaryTreeNode<TValue>> visitedNodes = [];
+        var treeJ = ToJsonTree(this, visitedNodes);
+        visitedNodes.Clear();
+        return treeJ;
+    }
+    protected virtual JsonObject ToJsonTree(INaryTreeNode<TValue> node, HashSet<INaryTreeNode<TValue>> visitedNodes) {
+        visitedNodes.Add(node);
+        JsonObject treeJ = [.. node.ToJson().AsObject()];
+
+        if (node.IsEnd) return treeJ;
+
+        JsonArray childrenJ = [];
+
+        foreach (var childNode in node.Children.Values) {
+            if (visitedNodes.Contains(childNode)) {
+                visitedNodes.Clear();
+                throw new IJsonable.CyclicReferenceException(
+                    $"Unable to convert this tree into {nameof(JsonObject)} since it contains cyclic references (Continuing would cause {nameof(StackOverflowException)})"
+                );
+            }
+            JsonObject childJ = ToJsonTree(childNode, visitedNodes);
+            childrenJ.Add(childJ);
+        }
+
+        treeJ.Add(nameof(Children), childrenJ);
+
+        return treeJ;
     }
 
+    protected static IEnumerable<INaryTreeNode<TValue>> Traverse(INaryTreeNode<TValue>? node) {
+        if (node is null) yield break;
+        yield return node;
+        foreach (var childNode in node.Children.Values)
+            foreach (var child in Traverse(childNode))
+                yield return child;
+    }
+    public virtual IEnumerator<INaryTreeNode<TValue>> GetEnumerator()
+        => Traverse(this).GetEnumerator();
 
-    public bool this[IEnumerable<TValue> sequence] => Contains(sequence, out _);
-    public bool this[INaryTreeNode<TValue> tree] => Contains(tree);
-    public INaryTreeNode<TValue>? this[TValue value] => TryGetChild(value);
+
+    public virtual bool this[IEnumerable<TValue> sequence] => Contains(sequence, out _);
+    public virtual bool this[INaryTreeNode<TValue> tree] => Contains(tree);
+    public virtual INaryTreeNode<TValue>? this[TValue value] => TryGetChild(value);
 
 
     /// <summary> Calls <see cref="Add(TValue)"/> </summary> 
@@ -161,7 +199,7 @@ where TValue : notnull {
     /// </summary>
     public static explicit operator TValue(NaryTreeNode<TValue> tree)
         => tree.Value;
-    /// <summary> Generate a new <see cref="NaryTreeNode{TValue}"/> with the provided <paramref name="value"/> as the root value </summary>
-    public static explicit operator NaryTreeNode<TValue>(TValue value)
-        => new(value);
+    // /// <summary> Generate a new <see cref="NaryTreeNode{TValue}"/> with the provided <paramref name="value"/> as the root value </summary>
+    // public static explicit operator NaryTreeNode<TValue>(TValue value)
+    //     => new(value);
 }
