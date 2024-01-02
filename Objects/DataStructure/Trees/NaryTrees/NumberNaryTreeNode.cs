@@ -22,7 +22,7 @@ public class NumberNaryTreeNode<TNumber>(
 where TNumber : notnull, INumber<TNumber> {
 
     public override JsonNode ToJson() => new JsonObject() {
-        { nameof(Value), Value.ToString() },
+        { nameof(Value), JsonValue.Create(Value) },
         { nameof(IsSequenceEnd), IsSequenceEnd.ToString() },
     };
 

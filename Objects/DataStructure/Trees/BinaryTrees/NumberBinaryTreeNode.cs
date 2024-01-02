@@ -15,7 +15,7 @@ class NumberNaryTreeNode<TValue>(
 where TValue : notnull {
 
     public override JsonNode ToJson() => new JsonObject() {
-        { nameof(Value), Value.ToString() },
+        { nameof(Value), JsonValue.Create(Value) },
         { nameof(Left), Left?.ToJson() },
         { nameof(Right), Right?.ToJson() },
     };
