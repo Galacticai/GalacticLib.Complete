@@ -6,7 +6,7 @@ public class SinglyLinkedListNode<TValue>(
         TValue value,
         SinglyLinkedListNode<TValue>? next = null
 
-) : IEnumerable<TValue> {
+) : IEnumerable<SinglyLinkedListNode<TValue>> {
 
     public TValue Value { get; set; } = value;
     public SinglyLinkedListNode<TValue>? Next { get; set; } = next;
@@ -15,10 +15,10 @@ public class SinglyLinkedListNode<TValue>(
         => $"[{string.Join(',', this)}]";
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator(); //? old... return modern one below
-    public IEnumerator<TValue> GetEnumerator() {
+    public IEnumerator<SinglyLinkedListNode<TValue>> GetEnumerator() {
         SinglyLinkedListNode<TValue>? node = this;
         while (node is not null) {
-            yield return node.Value;
+            yield return node;
             node = node.Next;
         }
     }
