@@ -26,9 +26,19 @@ where TNumber : notnull, INumber<TNumber> {
         { nameof(IsSequenceEnd), IsSequenceEnd.ToString() },
     };
 
-    public static NumberNaryTreeNode<TNumber> FromJson(JsonNode json) {
-        var value = json["Value"]!.GetValue<TNumber>();
-        var isSequenceEnd = json[nameof(IsSequenceEnd)]!.GetValue<bool>();
+    public static NumberNaryTreeNode<TNumber>? FromJson(JsonNode json) {
+        if (json is not JsonObject jsonO)
+            throw new ArgumentException($"The provided json is not a {nameof(JsonObject)}");
+
+        var valueProp = json[nameof(Value)];
+        PropertyNotFoundException.ThrowIfNull(valueProp, nameof(Value));
+
+        var isSequenceEndProp = json[nameof(IsSequenceEnd)];
+        PropertyNotFoundException.ThrowIfNull(isSequenceEndProp, nameof(IsSequenceEnd));
+
+        TNumber value = valueProp!.GetValue<TNumber>();
+        bool isSequenceEnd = isSequenceEndProp!.GetValue<bool>();
+
         return new(value, isSequenceEnd);
     }
 }
