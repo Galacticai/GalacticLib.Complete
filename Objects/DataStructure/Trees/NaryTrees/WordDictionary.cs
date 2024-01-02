@@ -1,6 +1,4 @@
-using GalacticLib.Objects.DataStructure.Trees.NaryTrees;
-
-namespace GalacticLib.Objects.DataStructure;
+namespace GalacticLib.Objects.DataStructure.Trees.NaryTrees;
 
 public class WordDictionary() : NumberNaryTreeNode<char>('\x02') {
     /// <summary> Check the existence of a sentence</summary>
