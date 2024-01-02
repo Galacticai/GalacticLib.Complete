@@ -16,8 +16,10 @@ classDiagram
         +GetEnumerator() : : IEnumerable(T)
     }
     notnull <|-- "is" TValue
-    INumber <|-- "inherits" TNumber
+    TValue <|-- "inherits" TNumber
     IJsonableObject <|-- "inherits" TObject
+    TValue <|-- "inherits" TObject
+    INumber <|-- "inherits" TNumber
 
     class CyclicReferenceException {
         +CyclicReferenceException(message: string?, innerException: Exception?)
@@ -29,8 +31,6 @@ classDiagram
         >T : IJsonableObject
         +FromJson(json: JsonNode): T
     }
-    TValue <|-- "inherits" TNumber
-    TValue <|-- "inherits" TObject
 
     IJsonable <|-- "inherits" IJsonableObject
     IJsonable --> CyclicReferenceException
