@@ -1,7 +1,7 @@
 using System.Text.Json.Nodes;
 
 namespace GalacticLib.Objects.DataStructure.Trees.BinaryTrees;
-class NumberNaryTreeNode<TValue>(
+public class NumberBinaryTreeNode<TValue>(
         TValue value,
         BinaryTreeNode<TValue>? left = null,
         BinaryTreeNode<TValue>? right = null
@@ -11,7 +11,7 @@ class NumberNaryTreeNode<TValue>(
         left,
         right
 
-), IJsonable<NumberNaryTreeNode<TValue>>
+), IJsonable<NumberBinaryTreeNode<TValue>>
 where TValue : notnull {
 
     public override JsonNode ToJson() => new JsonObject() {
@@ -20,7 +20,7 @@ where TValue : notnull {
         { nameof(Right), Right?.ToJson() },
     };
 
-    public static NumberNaryTreeNode<TValue>? FromJson(JsonNode json) {
+    public static NumberBinaryTreeNode<TValue>? FromJson(JsonNode json) {
         JsonNode? valueJ = json[nameof(Value)];
         PropertyNotFoundException.ThrowIfNull(valueJ, nameof(Value));
 
@@ -28,8 +28,8 @@ where TValue : notnull {
         JsonNode? rightJ = json[nameof(Right)];
 
         TValue value = valueJ!.GetValue<TValue>();
-        NumberNaryTreeNode<TValue>? left = leftJ is null ? null : NumberNaryTreeNode<TValue>.FromJson(leftJ);
-        NumberNaryTreeNode<TValue>? right = rightJ is null ? null : NumberNaryTreeNode<TValue>.FromJson(rightJ);
+        NumberBinaryTreeNode<TValue>? left = leftJ is null ? null : NumberBinaryTreeNode<TValue>.FromJson(leftJ);
+        NumberBinaryTreeNode<TValue>? right = rightJ is null ? null : NumberBinaryTreeNode<TValue>.FromJson(rightJ);
 
         return new(value, left, right);
     }
