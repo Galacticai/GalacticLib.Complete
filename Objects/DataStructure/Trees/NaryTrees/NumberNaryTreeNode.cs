@@ -1,7 +1,7 @@
 using System.Numerics;
 using System.Text.Json.Nodes;
 
-namespace GalacticLib.Objects.DataStructure.Trees;
+namespace GalacticLib.Objects.DataStructure.Trees.NaryTrees;
 
 /// <summary> Data structure representing n-ary tree node with support for <see cref="INumber{TValue}"/> data type </summary>
 /// <typeparam name="TNumber"> Number type of <see cref="Value"/> that inherits <see cref="INumber{TValue}"/> </typeparam>

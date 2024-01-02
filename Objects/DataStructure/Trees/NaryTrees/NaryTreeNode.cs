@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Nodes;
 
-namespace GalacticLib.Objects.DataStructure.Trees;
+namespace GalacticLib.Objects.DataStructure.Trees.NaryTrees;
 
 /// <summary> Data structure representing n-ary tree node </summary>
 /// <typeparam name="TValue"> Type of <see cref="Value"/> </typeparam>
@@ -133,7 +133,7 @@ where TValue : notnull {
         foreach (var childNode in node.Children.Values) {
             if (visitedNodes.Contains(childNode)) {
                 visitedNodes.Clear();
-                throw new IJsonable.CyclicReferenceException(
+                throw new CyclicReferenceException(
                     $"Unable to convert this tree into {nameof(JsonObject)} since it contains cyclic references (Continuing would cause {nameof(StackOverflowException)})"
                 );
             }

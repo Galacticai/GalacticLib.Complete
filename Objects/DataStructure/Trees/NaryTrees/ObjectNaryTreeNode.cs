@@ -1,6 +1,6 @@
 using System.Text.Json.Nodes;
 
-namespace GalacticLib.Objects.DataStructure.Trees;
+namespace GalacticLib.Objects.DataStructure.Trees.NaryTrees;
 
 /// <summary> Data structure representing n-ary tree node with support for <see cref="object"/>s that inherit <see cref="IJsonable{TValue}"/> </summary>
 /// <typeparam name="TObject"> <see cref="object"/> type of <see cref="Value"/> that inherits <see cref="IJsonable{TValue}"/> </typeparam>

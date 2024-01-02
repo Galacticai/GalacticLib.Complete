@@ -1,6 +1,6 @@
 using System.Collections;
 
-namespace GalacticLib.Objects.DataStructure.Trees;
+namespace GalacticLib.Objects.DataStructure.Trees.SinglyTrees;
 
 public class SinglyLinkedListNode<TValue>(
         TValue value,
