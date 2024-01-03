@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Text.Json.Nodes;
+using Gtk;
 
 namespace GalacticLib.Objects.DataStructure.Trees.Lists;
 
@@ -7,7 +8,7 @@ public abstract class ListNode<TValue>(
         TValue value,
         ListNode<TValue>? next = null
 
-) : IEnumerable<ListNode<TValue>>, IJsonable
+) : ITreeNode<TValue>
 where TValue : notnull {
 
     public TValue Value { get; set; } = value;
@@ -18,7 +19,7 @@ where TValue : notnull {
         => $"[{string.Join(',', this)}]";
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-    public IEnumerator<ListNode<TValue>> GetEnumerator() {
+    public IEnumerator<ITreeNode<TValue>> GetEnumerator() {
         ListNode<TValue>? node = this;
         while (node is not null) {
             yield return node;
@@ -29,7 +30,10 @@ where TValue : notnull {
     public abstract JsonNode ToJson();
 
     public static implicit operator List<TValue>(ListNode<TValue> node)
-        => [.. node];
+        => node.Aggregate(new List<TValue>(), (list, e) => {
+            list.Add(e.Value);
+            return list;
+        });
     public static implicit operator TValue(ListNode<TValue> node)
         => node.Value;
 }

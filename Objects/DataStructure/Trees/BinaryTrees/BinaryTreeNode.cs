@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Text.Json.Nodes;
 
 namespace GalacticLib.Objects.DataStructure.Trees.BinaryTrees;
@@ -11,11 +12,13 @@ public abstract class BinaryTreeNode<TValue>(
         TValue value,
         BinaryTreeNode<TValue>? left = null,
         BinaryTreeNode<TValue>? right = null
-) : IJsonable
+
+) : ITreeNode<TValue>
 where TValue : notnull {
-    public TValue Value = value;
-    public BinaryTreeNode<TValue>? Left = left;
-    public BinaryTreeNode<TValue>? Right = right;
+    public TValue Value { get; set; } = value;
+    public BinaryTreeNode<TValue>? Left { get; set; } = left;
+    public BinaryTreeNode<TValue>? Right { get; set; } = right;
+
 
     public IEnumerable<BinaryTreeNode<TValue>> InOrder() {
         if (Left is not null)
@@ -34,4 +37,12 @@ where TValue : notnull {
     public override string ToString() => ToString(InOrder());
 
     public abstract JsonNode ToJson();
+
+    public IEnumerator<ITreeNode<TValue>> GetEnumerator() {
+        throw new NotImplementedException();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator() {
+        throw new NotImplementedException();
+    }
 }

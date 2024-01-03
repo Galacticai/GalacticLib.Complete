@@ -153,9 +153,8 @@ where TValue : notnull {
             foreach (var child in Traverse(childNode))
                 yield return child;
     }
-    public virtual IEnumerator<INaryTreeNode<TValue>> GetEnumerator()
+    public virtual IEnumerator<ITreeNode<TValue>> GetEnumerator()
         => Traverse(this).GetEnumerator();
-
 
     public virtual bool this[IEnumerable<TValue> sequence] => Contains(sequence, out _);
     public virtual bool this[INaryTreeNode<TValue> tree] => Contains(tree);

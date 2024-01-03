@@ -6,7 +6,7 @@ using System.Text.Json.Nodes;
 namespace GalacticLib.Objects.DataStructure.Trees.NaryTrees;
 
 public interface INaryTreeNode<TValue>
-        : IEnumerable<INaryTreeNode<TValue>>, IJsonable
+        : ITreeNode<TValue>
         where TValue : notnull {
 
     /// <summary> Very important to generate the correct child type that will be added into the tree </summary>
