@@ -41,10 +41,10 @@ classDiagram
     class NumberTree {
         >TNumber: INumber
     }
-    notnull <|-- TValue
-    TValue <|-- TNumber
+    notnull <|-- TValue : is
+    TValue <|-- TNumber : is
     IJsonableObject <|-- TObject
-    TValue <|-- TObject
-    INumber <|-- TNumber
+    TValue<|-- TObject : is
+    INumber<|-- TNumber : is
 
 ```
