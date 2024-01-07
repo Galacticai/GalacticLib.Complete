@@ -37,6 +37,10 @@ where TValue : notnull {
             throw new ArgumentException($"Child tree is not a {nameof(NaryTreeNode<TValue>)}", nameof(childTree));
 
         if (force) {
+            //? Release child from parent
+            if (nary._Parent?.Remove(nary) == false)
+                return false;
+
             Children[nary.Value] = nary;
             nary._Parent = this;
             return true;
