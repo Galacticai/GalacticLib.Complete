@@ -37,11 +37,14 @@ where TValue : notnull {
             throw new ArgumentException($"Child tree is not a {nameof(NaryTreeNode<TValue>)}", nameof(childTree));
 
         if (force) {
-            nary._Parent = this;
             Children[nary.Value] = nary;
+            nary._Parent = this;
             return true;
         }
-        return Children.TryAdd(nary.Value, nary);
+
+        bool added = Children.TryAdd(nary.Value, nary);
+        if (added) nary._Parent = this;
+        return added;
     }
     public virtual bool Add(TValue value)
         => Add(Create(value), false);
