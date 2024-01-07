@@ -62,7 +62,7 @@ where TValue : notnull {
                 node = node.Get(value)!;
                 continue;
             }
-            NaryTreeNode<TValue> childNode = (NaryTreeNode<TValue>)Create(value);
+            NaryTreeNode<TValue> childNode = Create(value);
             bool added = node.Add(childNode);
             changed = changed || added;
             node = childNode;
