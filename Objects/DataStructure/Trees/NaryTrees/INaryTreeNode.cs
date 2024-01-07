@@ -19,7 +19,8 @@ public interface INaryTreeNode<TValue>
     /// <summary> End of tree (no children) </summary>
     public bool IsEnd { get; }
 
-    /// <summary> Add a child tree </summary>
+    /// <summary> Add a child tree </summary> 
+    /// <param name="force"> Replace if the a child with the same value was found </param>
     /// <returns> true if added </returns>
     public bool Add(INaryTreeNode<TValue> childTree, bool force = false);
     /// <summary> Add a new tree with the given <paramref name="value"/> </summary> 

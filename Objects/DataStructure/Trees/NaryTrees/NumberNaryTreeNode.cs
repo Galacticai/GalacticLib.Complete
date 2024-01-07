@@ -11,7 +11,7 @@ namespace GalacticLib.Objects.DataStructure.Trees.NaryTrees;
 public class NumberNaryTreeNode<TNumber>(
         TNumber value,
         bool isSequenceEnd = false,
-        Dictionary<TNumber, INaryTreeNode<TNumber>>? children = null
+        Dictionary<TNumber, NaryTreeNode<TNumber>>? children = null
 
 ) : NaryTreeNode<TNumber>(
         value,
@@ -20,6 +20,9 @@ public class NumberNaryTreeNode<TNumber>(
 
 ), IJsonable<NumberNaryTreeNode<TNumber>>
 where TNumber : notnull, INumber<TNumber> {
+
+    protected override NaryTreeNode<TNumber> Create(TNumber value)
+        => new NumberNaryTreeNode<TNumber>(value);
 
     public override JsonNode ToJson() => new JsonObject() {
         { nameof(Value), JsonValue.Create(Value) },

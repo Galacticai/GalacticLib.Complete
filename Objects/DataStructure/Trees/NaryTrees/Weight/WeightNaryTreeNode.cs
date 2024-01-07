@@ -8,7 +8,7 @@ public abstract class WeightNaryTreeNode<TValue>(
         bool isSequenceEnd = false,
         long weight = 0L,
         WeightType weightType = WeightType.ReadCount,
-        Dictionary<TValue, INaryTreeNode<TValue>>? children = null
+        Dictionary<TValue, NaryTreeNode<TValue>>? children = null
 
 ) : NaryTreeNode<TValue>(
         value,
@@ -45,15 +45,15 @@ public abstract class WeightNaryTreeNode<TValue>(
         }
     }
 
-    private new bool TryGetValue(TValue value, [MaybeNullWhen(false)] out INaryTreeNode<TValue>? node)
-        => base.TryGetValue(value, out node);
+    private new bool Get(TValue value, [MaybeNullWhen(false)] out INaryTreeNode<TValue>? node)
+        => base.Get(value, out node);
     public bool TryGetValue(TValue value, [MaybeNullWhen(false)] out WeightNaryTreeNode<TValue>? node) {
-        bool found = TryGetValue(value, out INaryTreeNode<TValue>? child);
+        bool found = Get(value, out INaryTreeNode<TValue>? child);
         node = (WeightNaryTreeNode<TValue>?)child;
         return found;
     }
-    public new WeightNaryTreeNode<TValue>? TryGetChild(TValue value)
-        => (WeightNaryTreeNode<TValue>?)base.TryGetChild(value);
+    public new WeightNaryTreeNode<TValue>? Get(TValue value)
+        => (WeightNaryTreeNode<TValue>?)base.Get(value);
 
 
     public new IEnumerator<WeightNaryTreeNode<TValue>> GetEnumerator() {
@@ -62,7 +62,7 @@ public abstract class WeightNaryTreeNode<TValue>(
     }
 
     /// <summary> Calls <see cref="TryGetChild(TValue)"/> </summary>
-    public new WeightNaryTreeNode<TValue>? this[TValue value] => (WeightNaryTreeNode<TValue>?)base.TryGetChild(value);
+    public new WeightNaryTreeNode<TValue>? this[TValue value] => (WeightNaryTreeNode<TValue>?)base.Get(value);
 
 
     /// <summary> Calls <see cref="NaryTreeNode{TValue}.Add(TValue)"/> </summary> 
@@ -98,14 +98,3 @@ public abstract class WeightNaryTreeNode<TValue>(
     }
 }
 
-/// <summary> The way <see cref="Weight"/> is incremented </summary>
-public enum WeightType {
-    /// <summary> No auto processing </summary>
-    Manual = 0,
-    /// <summary> Increment each time <see cref="Value"/> get accessor is called</summary>
-    ReadCount = 1,
-    /// <summary> Increment each time <see cref="Value"/> set accessor is called</summary>
-    WriteCount = 2,
-    /// <summary> <see cref="ReadCount"/> or <see cref="WriteCount"/> </summary>
-    ReadWriteCount = ReadCount | WriteCount,
-}

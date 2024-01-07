@@ -1,3 +1,4 @@
+using GLib;
 using System.Text.Json.Nodes;
 
 namespace GalacticLib.Objects.DataStructure.Trees.NaryTrees;
@@ -10,7 +11,7 @@ namespace GalacticLib.Objects.DataStructure.Trees.NaryTrees;
 public class ObjectNaryTreeNode<TObject>(
         TObject value,
         bool isSequenceEnd = false,
-        Dictionary<TObject, INaryTreeNode<TObject>>? children = null
+        Dictionary<TObject, NaryTreeNode<TObject>>? children = null
 
 ) : NaryTreeNode<TObject>(
         value,
@@ -19,6 +20,9 @@ public class ObjectNaryTreeNode<TObject>(
 
 ), IJsonable<ObjectNaryTreeNode<TObject>>
 where TObject : notnull, IJsonable<TObject> {
+
+    protected override NaryTreeNode<TObject> Create(TObject value)
+        => new ObjectNaryTreeNode<TObject>(value);
 
     public override JsonNode ToJson() => new JsonObject() {
         { nameof(Value), Value.ToJson() },
@@ -45,4 +49,5 @@ where TObject : notnull, IJsonable<TObject> {
 
         return new(value, isSequenceEnd);
     }
+
 }
