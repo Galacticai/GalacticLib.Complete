@@ -115,7 +115,9 @@ where TValue : notnull {
         if (childTree.Parent != this)
             throw new ArgumentException("Child tree must be a child of this tree", nameof(childTree));
 
-        var nary = (NaryTreeNode<TValue>)childTree;
+        if (childTree is not NaryTreeNode<TValue> nary)
+            throw new ArgumentException($"Child tree is not a {nameof(NaryTreeNode<TValue>)}", nameof(childTree));
+
         bool removed = Children.Remove(nary.Value);
         if (removed) nary._Parent = null;
         return removed;
