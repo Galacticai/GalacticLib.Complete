@@ -2,16 +2,17 @@ using System.Text.Json.Nodes;
 
 namespace GalacticLib.Objects.DataStructure.Trees.Lists;
 
-public class NumberListNode<TValue>(
-        TValue value,
-        ListNode<TValue>? next = null
+public class NumberListNode<TNumber>(
+        TNumber value,
+        ListNode<TNumber>? next = null
 
-) : ListNode<TValue>(
+) : ListNode<TNumber>(
         value,
         next
 
-), IJsonable<NumberListNode<TValue>>
-where TValue : notnull {
+), IJsonable<NumberListNode<TNumber>>
+where TNumber : notnull {
+
     public override string ToString()
         => $"[{string.Join(',', this)}]";
     public override JsonNode ToJson() {
@@ -19,25 +20,25 @@ where TValue : notnull {
         foreach (var node in this) array.Add(JsonValue.Create(node.Value));
         return array;
     }
-    public static NumberListNode<TValue>? FromJson(JsonNode json) {
+    public static NumberListNode<TNumber>? FromJson(JsonNode json) {
         if (json is not JsonArray numbers)
             throw new ArgumentException($"The provided json is not a {nameof(JsonArray)}");
         if (numbers.Count == 0) return null;
 
-        NumberListNode<TValue> root = FromValueJ(numbers[0]);
-        ListNode<TValue> node = root;
+        NumberListNode<TNumber> root = FromValueJ(numbers[0]);
+        ListNode<TNumber> node = root;
         for (int i = 1; i < numbers.Count; i++) {
-            NumberListNode<TValue>? child = FromValueJ(numbers[i]);
+            NumberListNode<TNumber>? child = FromValueJ(numbers[i]);
             node.Next = child;
             node = child;
         }
         return root;
     }
 
-    private static NumberListNode<TValue> FromValueJ(JsonNode? valueNode) {
+    private static NumberListNode<TNumber> FromValueJ(JsonNode? valueNode) {
         PropertyNotFoundException.ThrowIfNull(valueNode, nameof(Value));
 
-        TValue? value = valueNode!.GetValue<TValue>();
+        TNumber? value = valueNode!.GetValue<TNumber>();
         ArgumentNullException.ThrowIfNull(value, nameof(Value));
 
         return new(value);

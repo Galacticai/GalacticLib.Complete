@@ -2,40 +2,40 @@ using System.Text.Json.Nodes;
 
 namespace GalacticLib.Objects.DataStructure.Trees.Lists;
 
-public class ObjectListNode<TValue>(
-        TValue value,
-        ListNode<TValue>? next = null
+public class ObjectListNode<TObject>(
+        TObject value,
+        ListNode<TObject>? next = null
 
-) : ListNode<TValue>(
+) : ListNode<TObject>(
         value,
         next
 
-), IJsonable<ObjectListNode<TValue>>
-where TValue : notnull, IJsonable<TValue> {
+), IJsonable<ObjectListNode<TObject>>
+where TObject : notnull, IJsonable<TObject> {
     public override JsonNode ToJson() {
         JsonArray array = [];
         foreach (var node in this) array.Add(node.Value.ToJson());
         return array;
     }
-    public static ObjectListNode<TValue>? FromJson(JsonNode json) {
+    public static ObjectListNode<TObject>? FromJson(JsonNode json) {
         if (json is not JsonArray numbers)
             throw new ArgumentException($"The provided json is not a {nameof(JsonArray)}");
         if (numbers.Count == 0) return null;
 
-        ObjectListNode<TValue> root = FromValueJ(numbers[0]);
-        ListNode<TValue> node = root;
+        ObjectListNode<TObject> root = FromValueJ(numbers[0]);
+        ListNode<TObject> node = root;
         for (int i = 1; i < numbers.Count; i++) {
-            ObjectListNode<TValue>? child = FromValueJ(numbers[i]);
+            ObjectListNode<TObject>? child = FromValueJ(numbers[i]);
             node.Next = child;
             node = child;
         }
         return root;
     }
 
-    private static ObjectListNode<TValue> FromValueJ(JsonNode? valueNode) {
+    private static ObjectListNode<TObject> FromValueJ(JsonNode? valueNode) {
         PropertyNotFoundException.ThrowIfNull(valueNode, nameof(Value));
 
-        TValue? value = TValue.FromJson(valueNode!);
+        TObject? value = TObject.FromJson(valueNode!);
         ArgumentNullException.ThrowIfNull(value, nameof(Value));
 
         return new(value);
