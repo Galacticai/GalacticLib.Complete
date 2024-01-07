@@ -7,24 +7,27 @@ public class OTP : IDisposable {
     #region this object
 
     public byte[] Key { get; private set; }
+    public int KeyLength { get; }
     private long LifeSpanMS { get; }
     public bool Regenerate { get; }
     public bool IsExpired { get; private set; }
 
     private readonly Timer _Timer;
 
+#pragma warning disable CS8618 
     public OTP(int keyLength, TimeSpan lifeSpan, bool regenerate) {
         if (keyLength <= 0)
             throw new ArgumentOutOfRangeException(nameof(keyLength), "Key length must be positive");
         if (lifeSpan <= TimeSpan.Zero)
             throw new ArgumentOutOfRangeException(nameof(lifeSpan), "Life span must be positive");
 
-        Key = new byte[keyLength];
-        RandomNumberGenerator.Fill(Key);
+        KeyLength = keyLength;
+        RegenerateKeySilently(keyLength);
         Regenerate = regenerate;
         LifeSpanMS = (long)lifeSpan.TotalMilliseconds;
         _Timer = new(_ => OnTick(), null, LifeSpanMS, Regenerate ? LifeSpanMS : Timeout.Infinite);
     }
+#pragma warning restore CS8618
 
     #endregion
     #region events
@@ -55,9 +58,12 @@ public class OTP : IDisposable {
         }
     }
 
-    protected virtual void RegenerateKey(int keyLength) {
+    private void RegenerateKeySilently(int keyLength) {
         Key = new byte[keyLength];
         RandomNumberGenerator.Fill(Key);
+    }
+    protected virtual void RegenerateKey(int keyLength) {
+        RegenerateKeySilently(keyLength);
         Regenerated?.Invoke(this, Key, DateTime.Now, LifeSpan);
     }
 
