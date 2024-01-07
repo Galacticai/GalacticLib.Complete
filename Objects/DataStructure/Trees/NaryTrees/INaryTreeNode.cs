@@ -9,11 +9,8 @@ public interface INaryTreeNode<TValue>
         : ITreeNode<TValue>
         where TValue : notnull {
 
-    /// <summary> Very important to generate the correct child type that will be added into the tree </summary>
-    protected INaryTreeNode<TValue> Create(TValue value);
-
-    public TValue Value { get; set; }
-    public IDictionary<TValue, INaryTreeNode<TValue>> Children { get; set; }
+    public INaryTreeNode<TValue>? Parent { get; }
+    //public IDictionary<TValue, INaryTreeNode<TValue>> Children { get; set; }
 
     /// <summary> End of sequence (could have children that are for other sequences) 
     /// <br/> Example: ABC ... ABCDEF </summary>
@@ -32,12 +29,19 @@ public interface INaryTreeNode<TValue>
     /// <returns> true if the tree changed </returns>
     public bool Add([MinLength(1)] IEnumerable<TValue> sequence);
 
-
-    public bool TryGetValue(
+    /// <summary> Get a child tree having the provided <paramref name="value"/> </summary>
+    /// <param name="value"> Child tree value </param>
+    /// <param name="node"> Child tree </param>
+    /// <returns> true if <paramref name="node"/> was found </returns>
+    public bool Get(
             TValue value,
             [MaybeNullWhen(false)] out INaryTreeNode<TValue>? node
     );
-    public INaryTreeNode<TValue>? TryGetChild(TValue value);
+
+    /// <summary> Get a child tree having the provided <paramref name="value"/> </summary>
+    /// <param name="value"> Child tree value </param>
+    /// <returns> Child tree or null if not found </returns>
+    public INaryTreeNode<TValue>? Get(TValue value);
 
 
     /// <summary> Check if a direct child has the given <paramref name="value"/> (Only checks 1 level of children) </summary>
@@ -76,7 +80,7 @@ public interface INaryTreeNode<TValue>
     public bool this[IEnumerable<TValue> sequence] { get; }
     /// <summary> Calls <see cref="Contains(INaryTreeNode{TValue})"/> </summary> 
     public bool this[INaryTreeNode<TValue> tree] { get; }
-    /// <summary> Calls <see cref="TryGetChild(TValue)"/> </summary>
+    /// <summary> Calls <see cref="Get(TValue)"/> </summary>
     public INaryTreeNode<TValue>? this[TValue value] { get; }
 
 
