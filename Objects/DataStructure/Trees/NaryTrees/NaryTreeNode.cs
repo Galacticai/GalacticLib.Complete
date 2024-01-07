@@ -12,29 +12,36 @@ namespace GalacticLib.Objects.DataStructure.Trees.NaryTrees;
 public abstract class NaryTreeNode<TValue>(
         TValue value,
         bool isSequenceEnd = false,
-        Dictionary<TValue, INaryTreeNode<TValue>>? children = null
+        IDictionary<TValue, NaryTreeNode<TValue>>? children = null
 
 ) : INaryTreeNode<TValue>
 where TValue : notnull {
 
     public virtual TValue Value { get; set; } = value;
-    public virtual IDictionary<TValue, INaryTreeNode<TValue>> Children { get; set; }
-        = children ?? [];
+
+    public virtual INaryTreeNode<TValue>? Parent => _Parent;
+    protected NaryTreeNode<TValue>? _Parent;
+
+    protected virtual IDictionary<TValue, NaryTreeNode<TValue>> Children { get; set; }
+        = children ?? new Dictionary<TValue, NaryTreeNode<TValue>>();
 
     public virtual bool IsSequenceEnd { get; set; } = isSequenceEnd;
 
     public virtual bool IsEnd => Children.Count == 0;
 
-
-    public virtual INaryTreeNode<TValue> Create(TValue value)
-        => Create(value);
+    /// <summary> Very important to instantiate the correct child type </summary> 
+    protected abstract NaryTreeNode<TValue> Create(TValue value);
 
     public virtual bool Add(INaryTreeNode<TValue> childTree, bool force = false) {
+        if (childTree is not NaryTreeNode<TValue> nary)
+            throw new ArgumentException($"Child tree is not a {nameof(NaryTreeNode<TValue>)}", nameof(childTree));
+
         if (force) {
-            Children[childTree.Value] = childTree;
+            nary._Parent = this;
+            Children[nary.Value] = nary;
             return true;
         }
-        return Children.TryAdd(childTree.Value, childTree);
+        return Children.TryAdd(nary.Value, nary);
     }
     public virtual bool Add(TValue value)
         => Add(Create(value), false);
@@ -45,7 +52,7 @@ where TValue : notnull {
         bool changed = false;
         foreach (TValue value in sequence) {
             if (node.Contains(value)) {
-                node = node.TryGetChild(value)!;
+                node = node.Get(value)!;
                 continue;
             }
             NaryTreeNode<TValue> childNode = (NaryTreeNode<TValue>)Create(value);
@@ -58,10 +65,13 @@ where TValue : notnull {
     }
 
 
-    public virtual bool TryGetValue(TValue value, [MaybeNullWhen(false)] out INaryTreeNode<TValue>? node)
-        => Children.TryGetValue(value, out node);
-    public virtual INaryTreeNode<TValue>? TryGetChild(TValue value) {
-        _ = TryGetValue(value, out INaryTreeNode<TValue>? node);
+    public virtual bool Get(TValue value, [MaybeNullWhen(false)] out INaryTreeNode<TValue>? node) {
+        bool found = Children.TryGetValue(value, out var child);
+        node = child; //? Cant "out node" directly, but can implictly cast here "node = child"
+        return found;
+    }
+    public virtual INaryTreeNode<TValue>? Get(TValue value) {
+        _ = Get(value, out INaryTreeNode<TValue>? node);
         return node;
     }
 
@@ -81,7 +91,7 @@ where TValue : notnull {
         NaryTreeNode<TValue> node = this;
 
         foreach (TValue value in sequence) {
-            NaryTreeNode<TValue>? childNode = (NaryTreeNode<TValue>?)node.TryGetChild(value);
+            NaryTreeNode<TValue>? childNode = (NaryTreeNode<TValue>?)node.Get(value);
             if (childNode is null) goto Fail;
             nodes.Add(childNode);
             node = childNode;
@@ -94,8 +104,21 @@ where TValue : notnull {
         return false;
     }
 
-    public virtual bool Remove(TValue value) => Children.Remove(value);
-    public virtual bool Remove(INaryTreeNode<TValue> childTree) => Children.Remove(childTree.Value);
+    public virtual bool Remove(INaryTreeNode<TValue> childTree) {
+        if (childTree.Parent != this)
+            throw new ArgumentException("Child tree must be a child of this tree", nameof(childTree));
+
+        var nary = (NaryTreeNode<TValue>)childTree;
+        bool removed = Children.Remove(nary.Value);
+        if (removed) nary._Parent = null;
+        return removed;
+    }
+    public virtual bool Remove(TValue value) {
+        if (Get(value) is not INaryTreeNode<TValue> child)
+            return false;
+        //? Must use this so it checks parent/child relationship
+        return Remove(child);
+    }
     public virtual bool Remove([MinLength(1)] IEnumerable<TValue> sequence) {
         ArgumentNullException.ThrowIfNull(sequence);
 
@@ -103,26 +126,29 @@ where TValue : notnull {
         if (!found) return false;
 
         for (int i = nodes!.Count - 1; i > 0; i--) {
-            var parent = nodes[i - 1];
             var child = nodes[i];
-            parent.Remove(child);
+            if (child.Parent is null)
+                throw new NullReferenceException("BUG: Parent should not be null in this context");
+            child.Parent.Remove(child);
         }
         Remove(nodes[0]);
 
         return true;
     }
 
-    public virtual void ClearChildren() => Children.Clear();
+    public virtual void ClearChildren() {
+        foreach (var (_, child) in Children) Remove(child);
+    }
 
 
     public abstract JsonNode ToJson();
     public virtual JsonObject ToJsonTree() {
-        HashSet<INaryTreeNode<TValue>> visitedNodes = [];
-        var treeJ = ToJsonTree(this, visitedNodes);
-        visitedNodes.Clear();
+        HashSet<NaryTreeNode<TValue>> visitedNodes = [];
+        JsonObject treeJ = ToJsonTree(this, visitedNodes);
+        visitedNodes.Clear(); //? Explicitly avoid memory leak
         return treeJ;
     }
-    protected virtual JsonObject ToJsonTree(INaryTreeNode<TValue> node, HashSet<INaryTreeNode<TValue>> visitedNodes) {
+    protected virtual JsonObject ToJsonTree(NaryTreeNode<TValue> node, HashSet<NaryTreeNode<TValue>> visitedNodes) {
         visitedNodes.Add(node);
         JsonObject treeJ = [.. node.ToJson().AsObject()];
 
@@ -146,7 +172,7 @@ where TValue : notnull {
         return treeJ;
     }
 
-    protected static IEnumerable<INaryTreeNode<TValue>> Traverse(INaryTreeNode<TValue>? node) {
+    protected static IEnumerable<INaryTreeNode<TValue>> Traverse(NaryTreeNode<TValue>? node) {
         if (node is null) yield break;
         yield return node;
         foreach (var childNode in node.Children.Values)
@@ -158,7 +184,7 @@ where TValue : notnull {
 
     public virtual bool this[IEnumerable<TValue> sequence] => Contains(sequence, out _);
     public virtual bool this[INaryTreeNode<TValue> tree] => Contains(tree);
-    public virtual INaryTreeNode<TValue>? this[TValue value] => TryGetChild(value);
+    public virtual INaryTreeNode<TValue>? this[TValue value] => Get(value);
 
 
     /// <summary> Calls <see cref="Add(TValue)"/> </summary> 
