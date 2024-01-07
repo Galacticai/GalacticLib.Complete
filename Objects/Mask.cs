@@ -17,23 +17,19 @@ namespace GalacticLib.Objects;
 /// </summary>
 /// <typeparam name="TMaskKey"> Key type of <see cref="Maskers"/> dictionary </typeparam>
 /// <typeparam name="TValue"> Type of the <see cref="Value"/> </typeparam>
-public class Mask<TMaskKey, TValue>
+public class Mask<TMaskKey, TValue>(
+        TValue baseValue,
+        SortedDictionary<TMaskKey, Mask<TMaskKey, TValue>.Masker> maskers
+
 ) : IEnumerable<TValue>, IJsonable
-        where TMaskKey : notnull, IEquatable<TMaskKey> {
+where TMaskKey : notnull, IEquatable<TMaskKey> {
+    public Mask(TValue originalValue) : this(originalValue, []) { }
 
     /// <summary> Dictionary of <see cref="Masker"/> functions that are used successively to generate <see cref="Value"/> 
     /// <br/> with <typeparamref name="TMaskKey"/> as the key (to make it easier to access the <see cref="Masker"/>s </summary>
-    public SortedDictionary<TMaskKey, Masker> Maskers { get; }
+    public SortedDictionary<TMaskKey, Masker> Maskers { get; } = maskers;
     /// <summary> Original value without the effect of <see cref="Maskers"/> </summary>
-    public TValue BaseValue { get; }
-
-    public Mask(TValue baseValue, SortedDictionary<TMaskKey, Masker> maskers) {
-        if (baseValue is null)
-            throw new ArgumentNullException(nameof(baseValue));
-        BaseValue = baseValue;
-        Maskers = maskers;
-    }
-    public Mask(TValue originalValue) : this(originalValue, []) { }
+    public TValue BaseValue { get; } = baseValue;
 
 
     /// <summary> Value after the effect of <see cref="Maskers"/> </summary>
@@ -101,6 +97,7 @@ public class Mask<TMaskKey, TValue>
         }
     }
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
     /// <summary> Masking function used in a chain.
     /// <br/> Each <see cref="Masker"/> gets the value of the previous <see cref="Masker"/> into the <paramref name="value"/> parameter,
     /// <br/> then passes the result to the next <see cref="Masker"/> in <see cref="Maskers"/> </summary>
@@ -111,9 +108,10 @@ public class Mask<TMaskKey, TValue>
     /// <br/> with <paramref name="value"/> as the <see cref="BaseValue"/> of the mask </returns>
     public static explicit operator Mask<TMaskKey, TValue>(TValue value)
         => new(value);
+
     /// <summary> Convert <see cref="Mask{TMaskKey,TValue}"/> to <typeparamref name="TValue"/> </summary>
     /// <returns> The final <see cref="Value"/> which is affected by <see cref="Maskers"/> 
-    /// <br/> ⚠️ This means <see cref="Maskers"/> will no longer affect it because it's no longer inside a <see cref="Mask{TMaskKey,TValue}"/>
+    /// <para> ⚠️ This means <see cref="Maskers"/> will no longer affect it because it's no longer inside a <see cref="Mask{TMaskKey,TValue}"/> </para>
     /// </returns>
     public static explicit operator TValue(Mask<TMaskKey, TValue> mask)
         => mask.Value;
