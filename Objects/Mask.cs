@@ -7,6 +7,9 @@
 //?
 // —————————————————————————————————————————————
 
+using System.Collections;
+using System.Text.Json.Nodes;
+
 namespace GalacticLib.Objects;
 
 /// <summary> Masks the original value with a different one,
@@ -52,6 +55,38 @@ public class Mask<TMaskKey, TValue>
 
     /// <summary> Clear <see cref="Maskers"/> So <see cref="Value"/> will return <see cref="BaseValue"/> </summary>
     public void Reset() => Maskers.Clear();
+
+
+    public JsonNode ToJson() {
+        string jsonableMessage = $"{nameof(TValue)} should inherit {nameof(IJsonable)} in order to add here";
+
+        JsonObject obj = new() {
+            { nameof(BaseValue), jsonableMessage },
+            { $"{nameof(Maskers)}Count", JsonValue.Create(Maskers.Count) },
+            { "Values", jsonableMessage },
+        };
+
+        if (!typeof(TValue).IsSubclassOf(typeof(IJsonable)))
+            return obj;
+
+        obj[nameof(BaseValue)]
+            = BaseValue is null
+            ? null
+            : ((IJsonable)BaseValue).ToJson();
+
+        JsonArray values = [];
+        foreach (var value in this) {
+            if (value is null) {
+                values.Add(null);
+                continue;
+            }
+            var jsonable = (IJsonable)value!;
+            values.Add(jsonable.ToJson());
+        }
+        obj["Values"] = values;
+
+        return obj;
+    }
 
     /// <summary> Run <see cref="Maskers"/> and yield each result. 
     /// <br/> ℹ️ Starts with <see cref="BaseValue"/> </summary>
