@@ -10,16 +10,6 @@ public static class Zip {
         while ((cnt = src.Read(bytes, 0, bytes.Length)) != 0)
             dest.Write(bytes, 0, cnt);
     }
-    public static byte[] CompressIfSmaller(this string str, out bool didCompress) {
-        byte[] compressed = str.Compress();
-        if (str.Length >= compressed.Length) {
-            didCompress = true;
-            return compressed;
-        } else {
-            didCompress = false;
-            return Encoding.UTF8.GetBytes(str);
-        }
-    }
     public static byte[] Compress(this string str) {
         var bytes = Encoding.UTF8.GetBytes(str);
         using var msi = new MemoryStream(bytes);
@@ -29,10 +19,10 @@ public static class Zip {
         return mso.ToArray();
     }
     public static string Decompress(this byte[] bytes) {
-        using var msi = new MemoryStream(bytes);
-        using var mso = new MemoryStream();
-        using (var gs = new GZipStream(msi, CompressionMode.Decompress))
-            gs._CopyTo(mso);
-        return Encoding.UTF8.GetString(mso.ToArray());
+        using var inStream = new MemoryStream(bytes);
+        using var outStream = new MemoryStream();
+        using (var gzStream = new GZipStream(inStream, CompressionMode.Decompress))
+            gzStream._CopyTo(outStream);
+        return Encoding.UTF8.GetString(outStream.ToArray());
     }
 }
