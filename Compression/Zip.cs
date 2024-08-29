@@ -21,8 +21,8 @@ public static class Zip {
     public static string Decompress(this byte[] bytes) {
         using var inStream = new MemoryStream(bytes);
         using var outStream = new MemoryStream();
-        using (var gzStream = new GZipStream(inStream, CompressionMode.Decompress))
-            gzStream._CopyTo(outStream);
+        using var gzStream = new GZipStream(inStream, CompressionMode.Decompress);
+        gzStream._CopyTo(outStream);
         return Encoding.UTF8.GetString(outStream.ToArray());
     }
 }
