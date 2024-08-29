@@ -17,41 +17,17 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference
-            Include="Aspose.SVG"
-            Version="23.4.0" />
-        <PackageReference
-            Include="GtkSharp"
-            Version="3.24.24.95" />
-        <PackageReference
-            Include="Newtonsoft.Json"
-            Version="13.0.3" />
-        <PackageReference
-            Include="Shell.NET"
-            Version="0.2.2" />
-        <PackageReference
-            Include="System.Collections"
-            Version="4.3.0" />
-        <PackageReference
-            Include="System.Configuration.ConfigurationManager"
-            Version="7.0.0" />
-        <PackageReference
-            Include="System.Drawing.Common"
-            Version="7.0.0" />
-        <PackageReference
-            Include="System.Drawing.Primitives"
-            Version="4.3.0" />
-        <PackageReference
-            Include="System.Resources.Extensions"
-            Version="7.0.0" />
-        <PackageReference
-            Include="System.Runtime"
-            Version="4.3.1" />
-        <PackageReference
-            Include="System.Runtime.Extensions"
-            Version="4.3.1" />
-        <PackageReference
-            Include="System.Security.Cryptography.Algorithms"
-            Version="4.3.1" />
+        <PackageReference Include="Aspose.SVG" Version="23.4.0" />
+        <PackageReference Include="GtkSharp" Version="3.24.24.95" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+        <PackageReference Include="Shell.NET" Version="0.2.2" />
+        <PackageReference Include="System.Collections" Version="4.3.0" />
+        <PackageReference Include="System.Configuration.ConfigurationManager" Version="7.0.0" />
+        <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
+        <PackageReference Include="System.Drawing.Primitives" Version="4.3.0" />
+        <PackageReference Include="System.Resources.Extensions" Version="7.0.0" />
+        <PackageReference Include="System.Runtime" Version="4.3.1" />
+        <PackageReference Include="System.Runtime.Extensions" Version="4.3.1" />
+        <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.1" />
     </ItemGroup>
 </Project>
