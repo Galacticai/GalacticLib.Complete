@@ -68,10 +68,10 @@ public class Plot {
     #region
 
     /// <summary> f(x) =  </summary>
-    /// <exception cref="ArgumentOutOfRangeException"><paramref name="standardDeviation"/></exception>
+    /// <exception cref="ArgumentOutOfRangeException"/>
     public static Plot NormalDistribution(double cellWidth, double mean, double standardDeviation) {
         if (standardDeviation == 0)
-            throw new ArgumentOutOfRangeException(nameof(standardDeviation), "Standard deciation can't be 0.");
+            throw new ArgumentOutOfRangeException(nameof(standardDeviation), "Standard deviation can't be 0.");
 
         double boundary = 3 * standardDeviation;
         Range<double> range = new(mean - boundary, mean + boundary);
@@ -101,10 +101,13 @@ public class Plot {
     public override int GetHashCode()
         => HashCode.Combine(CellWidth, Range, Fx);
     public override bool Equals(object? obj)
-        => obj is Plot distrobution
-        && CellWidth.Equals(distrobution.CellWidth)
-        && Range.Equals(distrobution.Range)
-        && Fx.Equals(distrobution.Fx);
+        => ReferenceEquals(this, obj)
+        || (
+            obj is Plot distribution
+            && CellWidth.Equals(distribution.CellWidth)
+            && Range.Equals(distribution.Range)
+            && Fx.Equals(distribution.Fx)
+        );
 
     #endregion
     #region Operators
