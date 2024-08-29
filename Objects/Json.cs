@@ -15,4 +15,16 @@ public static class Json {
     public static T? ToObject<T>(string json)
         => JsonConvert.DeserializeObject<T>(json, _Settings);
 
+
+    // public static JsonObject ToJson<T>(this T obj, HashSet<string>? onlyProperties = null) { 
+    //     Type type = typeof(T);
+    //     foreach (var prop in type.GetProperties()) {
+    //         //? Filtering && name is not found
+    //         bool skip = onlyProperties?.Contains(prop.Name) == false;
+    //         if (skip) continue;
+
+    //         bool nullable = Nullable.GetUnderlyingType(prop.PropertyType) is not null;
+    //         var value = prop.GetValue(obj); 
+    //     }
+    // }
 }
