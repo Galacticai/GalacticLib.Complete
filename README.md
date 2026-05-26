@@ -32,7 +32,7 @@ This repository includes all child packages directly instead of referencing thei
 
 > <a href="https://nuget.org/packages/GalacticLib.Math">
 >     <img
->         alt="Nuget package is not available"
+>         alt="Build Stats"
 >         src="https://buildstats.info/nuget/GalacticLib.Math"
 >     />
 > </a>
@@ -52,7 +52,7 @@ This repository includes all child packages directly instead of referencing thei
 >> <br/>
 >> <a href="https://nuget.org/packages/GalacticLib.Math.Numerics">
 >>     <img
->>         alt="Nuget package is not available"
+>>         alt="Build Stats"
 >>         src="https://buildstats.info/nuget/GalacticLib.Math.Numerics"
 >>     />
 >> </a>
@@ -70,7 +70,7 @@ This repository includes all child packages directly instead of referencing thei
 >> <br/>
 >> <a href="https://nuget.org/packages/GalacticLib.Math.Space">
 >>     <img
->>         alt="Nuget package is not available"
+>>         alt="Build Stats"
 >>         src="https://buildstats.info/nuget/GalacticLib.Math.Space"
 >>     />
 >> </a>
@@ -89,7 +89,7 @@ This repository includes all child packages directly instead of referencing thei
 > <br/>
 > <a href="https://nuget.org/packages/GalacticLib.Misc">
 >     <img
->         alt="Nuget package is not available"
+>         alt="Build Stats"
 >         src="https://buildstats.info/nuget/GalacticLib.Misc"
 >     />
 > </a>
@@ -111,7 +111,7 @@ This repository includes all child packages directly instead of referencing thei
 > <br/>
 > <a href="https://nuget.org/packages/GalacticLib.Platforms">
 >     <img
->         alt="Nuget package is not available"
+>         alt="Build Stats"
 >         src="https://buildstats.info/nuget/GalacticLib.Platforms"
 >     />
 > </a>
@@ -133,7 +133,7 @@ This repository includes all child packages directly instead of referencing thei
 > <br/>
 > <a href="https://nuget.org/packages/GalacticLib.Semantic">
 >     <img
->         alt="Nuget package is not available"
+>         alt="Build Stats"
 >         src="https://buildstats.info/nuget/GalacticLib.Semantic"
 >     />
 > </a>
@@ -152,7 +152,7 @@ This repository includes all child packages directly instead of referencing thei
 > <br/>
 > <a href="https://nuget.org/packages/GalacticLib.Unity">
 >     <img
->         alt="Nuget package is not available"
+>         alt="Build Stats"
 >         src="https://buildstats.info/nuget/GalacticLib.Unity"
 >     />
 > </a>
